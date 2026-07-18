@@ -274,20 +274,3 @@ O diagrama descreve o que existe no domínio e o que é produzido. Ele não dete
 Essas decisões devem transformar o modelo em código sem alterar sua estrutura conceitual nem as regras de negócio congeladas.
 
 ---
-
-## Pontos que o autor deve compreender
-
-Antes de considerar este documento finalizado, o autor deve ser capaz de explicar:
-
-1. Por que `Drone`, `Order`, `Coordinate`, `Trip`, `ImpossibleOrder` e `PlanningResult` representam responsabilidades diferentes.
-2. Por que `Coordinate` existe em vez de manter `X` e `Y` diretamente em `Order`.
-3. Por que `Order` representa a entrada do domínio e não deve carregar decisões do planejamento.
-4. Por que `ImpossibleOrder` referencia um `Order` e mantém `Reason` separadamente.
-5. Por que `Trip` referencia o drone e agrupa os pedidos planejados.
-6. Por que `TotalWeight` e `TotalDistance` são valores consolidados da viagem.
-7. Por que `PlanningResult` agrega tanto `Trips` quanto `ImpossibleOrders`.
-8. A diferença entre classes que representam dados e resultados e componentes que executam o algoritmo.
-9. Por que `Drone` e `Trip` não devem coordenar o planejamento completo.
-10. Por que o modelo não inclui banco de dados, API ou infraestrutura.
-11. Quais tipos, validações e regras de mutabilidade ainda precisam ser definidos na implementação.
-12. Como os cenários de `spec-validation.md` confirmarão que o código preserva o modelo e as regras congeladas.

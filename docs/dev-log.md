@@ -292,3 +292,165 @@ A modelagem conceitual mostrou que representar corretamente o domínio é difere
 ### Próximo passo
 
 Projetar o modelo de implementação, definindo como os conceitos do domínio serão representados em C#, suas estruturas, tipos, encapsulamento e componentes de comportamento antes do início da implementação.
+
+---
+
+---
+
+## Sessão 6 — Planejamento técnico da solução
+
+### Objetivo
+
+Definir a organização da solução e projetar como os conceitos do domínio serão representados em C#, antes do início da implementação.
+
+### Resultado
+
+Foi definida uma arquitetura simples para o MVP, composta por dois projetos de produção e dois projetos de testes.
+
+Também foi concluído o projeto dos principais modelos de implementação, incluindo seus tipos, atributos, responsabilidades, encapsulamento, mutabilidade e regras de validação.
+
+### Atividades realizadas
+
+- Definição dos projetos que compõem a solution.
+- Definição das responsabilidades e dependências entre os projetos.
+- Definição da localização dos testes unitários e de integração.
+- Avaliação da necessidade de uma camada de aplicação.
+- Simplificação da arquitetura para evitar camadas sem responsabilidade concreta.
+- Definição da representação dos modelos do domínio em C#.
+- Comparação entre `class`, `record` e `record struct`.
+- Definição da estratégia de imutabilidade dos modelos.
+- Definição da representação da ordem de entrada de drones e pedidos.
+- Avaliação da representação dos motivos de impossibilidade.
+- Separação das responsabilidades de validação entre API, modelos do domínio e `TripPlanner`.
+- Definição da exposição somente para leitura das coleções de resultados.
+
+### Decisão — Estrutura da solution
+
+A solution será organizada nos seguintes projetos:
+
+```text
+DroneDeliveryCase.sln
+
+src/DroneDelivery.Domain + /DroneDelivery.Api/
+
+tests/DroneDelivery.Domain.Tests/ + /DroneDelivery.Api.IntegrationTests/
+
+```
+
+O projeto `DroneDelivery.Domain` concentrará os modelos do domínio, o algoritmo de planejamento e os componentes auxiliares de cálculo.
+
+O projeto `DroneDelivery.Api` será responsável pelos contratos HTTP, conversão entre contratos e domínio, configuração da aplicação e exposição do endpoint.
+
+O projeto `DroneDelivery.Domain.Tests` conterá os testes unitários das regras do domínio e do algoritmo.
+
+O projeto `DroneDelivery.Api.IntegrationTests` conterá os testes de integração do endpoint e do fluxo HTTP.
+
+Não será criado um projeto `Application`, pois o MVP não possui casos de uso ou orquestrações adicionais que justifiquem uma camada intermediária. A API chamará diretamente o `TripPlanner`.
+
+
+### Decisão — Representação dos modelos em C#
+
+Os modelos serão representados da seguinte forma:
+
+| Modelo | Representação |
+|--------|---------------|
+| `Drone` | `class` |
+| `Order` | `class` |
+| `Coordinate` | `readonly record struct` |
+| `Trip` | `class` |
+| `ImpossibleOrder` | `class` |
+| `PlanningResult` | `class` |
+
+`Coordinate` será representado como um tipo por valor porque não possui identidade própria, deve ser imutável e duas coordenadas com os mesmos valores representam a mesma posição.
+
+Os demais modelos serão implementados como classes. Não será utilizado `sealed`, pois o domínio não possui hierarquias e restringir a herança não acrescentaria benefício relevante ao MVP.
+
+
+### Decisão — Imutabilidade e encapsulamento
+
+Os modelos serão criados em estados válidos e não serão alterados durante a execução do planejamento.
+
+Não serão utilizados setters públicos para propriedades que fazem parte do estado dos objetos.
+
+O `TripPlanner` poderá utilizar coleções e variáveis internas mutáveis durante a execução, mas os objetos de entrada e os resultados finais permanecerão estáveis.
+
+As coleções de `Trip` e `PlanningResult` serão expostas somente para leitura e protegidas contra alterações externas.
+
+
+### Decisão — Ordem de entrada
+
+`Drone` e `Order` possuirão a propriedade `InputOrder`.
+
+Esse valor é necessário para os critérios determinísticos de desempate definidos na especificação funcional.
+
+O cliente não enviará `InputOrder` no contrato HTTP. A API atribuirá o valor com base na posição de cada elemento nas coleções de drones e pedidos recebidas na requisição.
+
+Dessa forma, a ordem da coleção será a única fonte de verdade, enquanto o domínio preservará o valor durante toda a execução do algoritmo.
+
+
+### Decisão — Motivo dos pedidos impossíveis
+
+O motivo associado a um `ImpossibleOrder` será representado pelo enum `ImpossibleReason`, em vez de uma string livre.
+
+A utilização de um conjunto fechado de valores evita inconsistências textuais, facilita testes e mantém as causas de impossibilidade explicitamente representadas no domínio.
+
+A API poderá converter o valor para uma representação textual apropriada na resposta HTTP.
+
+
+### Decisão — Validação
+
+As validações serão distribuídas conforme a responsabilidade de cada componente.
+
+A API será responsável por:
+
+- validar a estrutura da requisição
+- identificar campos obrigatórios ausentes
+- validar a conversão dos valores recebidos
+- converter os contratos HTTP em objetos do domínio.
+
+Os construtores dos modelos serão responsáveis por impedir estados intrinsecamente inválidos, como:
+
+- identificadores vazios
+- pesos, capacidades e alcances inválidos
+- coordenadas não finitas
+- coleções nulas
+- objetos de resultado incompletos.
+
+O `TripPlanner` será responsável pelas validações que dependem do conjunto completo de drones e pedidos ou da execução do algoritmo, como:
+
+- identificadores duplicados
+- definição de pedidos impossíveis
+- seleção de drones elegíveis
+- respeito aos limites de capacidade e alcance
+- garantia de que cada pedido apareça uma única vez no resultado
+- consistência final do planejamento.
+
+Serão utilizadas apenas exceções padrão de argumento do .NET para impedir a criação de objetos inválidos.
+
+Pedidos impossíveis não serão tratados como exceções, pois representam um resultado esperado do planejamento.
+
+### Principais conclusões
+
+- A arquitetura da solution foi mantida simples e adequada ao escopo do MVP.
+- O domínio permanecerá independente da API e de detalhes de infraestrutura.
+- Não será criada uma camada de aplicação sem responsabilidade concreta.
+- Os modelos serão predominantemente imutáveis.
+- `Coordinate` terá semântica de valor.
+- A ordem de entrada será preservada no domínio, mas derivada das coleções recebidas pela API.
+- Os motivos de impossibilidade serão representados por um enum.
+- As validações foram distribuídas entre API, construtores e `TripPlanner` conforme o conhecimento de cada componente.
+- As decisões são suficientes para orientar a implementação sem alterar o modelo conceitual aprovado.
+
+### Lições aprendidas
+
+O planejamento técnico demonstrou que uma arquitetura com mais camadas não é necessariamente uma arquitetura melhor.
+
+A estrutura da solução deve refletir responsabilidades reais do sistema. Para este MVP, manter o domínio independente e permitir que a API chame diretamente o planejador oferece organização suficiente sem introduzir abstrações que não agregariam valor.
+
+Também foi possível distinguir a modelagem conceitual do projeto de implementação: o primeiro define os conceitos existentes no domínio, enquanto o segundo define como esses conceitos serão representados tecnicamente em C#.
+
+### Próximo passo
+
+Definir os enums utilizados pelo domínio e planejar os casos de teste que validarão as regras do algoritmo antes do início da implementação.
+
+---
