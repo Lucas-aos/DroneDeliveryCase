@@ -454,3 +454,45 @@ Também foi possível distinguir a modelagem conceitual do projeto de implementa
 Definir os enums utilizados pelo domínio e planejar os casos de teste que validarão as regras do algoritmo antes do início da implementação.
 
 ---
+
+## Sessão 7 — Definição dos enums e planejamento dos testes
+
+### Objetivo
+
+Consolidar os últimos elementos do domínio antes da implementação e definir a estratégia de testes do MVP.
+
+### Resultado
+
+Foram definidos os enums utilizados pelo domínio e estabelecida a estratégia geral da suíte de testes, incluindo sua organização, prioridades e principais cenários.
+
+### Atividades realizadas
+
+- Definição dos enums do domínio.
+- Avaliação da necessidade de valores neutros.
+- Definição da precedência explícita das prioridades.
+- Planejamento da suíte de testes.
+- Separação entre testes unitários e de integração.
+- Priorização dos cenários críticos.
+
+### Decisões tomadas
+
+- O domínio utilizará apenas os enums `Priority` e `ImpossibleReason`.
+- Nenhum dos enums possuirá valores neutros.
+- A precedência `High > Medium > Low` será aplicada explicitamente pela lógica do algoritmo.
+- A maior parte da cobertura ficará em `DroneDelivery.Domain.Tests`.
+- Os testes de integração ficarão concentrados em `DroneDelivery.Api.IntegrationTests`.
+- Os testes serão implementados por prioridade, iniciando pelas regras centrais do algoritmo.
+
+### Principais conclusões
+
+- Todos os tipos fechados do domínio foram consolidados.
+- A estratégia de testes cobre as principais regras funcionais e critérios de desempate.
+- O planejamento está suficientemente definido para iniciar a implementação.
+
+### Lições aprendidas
+
+O planejamento da suíte mostrou que testes devem validar o comportamento definido pela especificação funcional, e não detalhes da implementação. A separação entre testes unitários e de integração contribui para uma validação mais clara e organizada do sistema.
+
+### Próximo passo
+
+Iniciar a implementação do domínio, desenvolvendo cada componente acompanhado pelos testes correspondentes de maior prioridade.
