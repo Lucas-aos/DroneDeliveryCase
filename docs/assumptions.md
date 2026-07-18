@@ -1,8 +1,8 @@
 # Premissas do Projeto
 
-Este documento registra decisões adotadas para pontos que não estão completamente definidos no enunciado.
+Este documento registra as decisões adotadas para pontos que não estão completamente definidos no enunciado.
 
-As questões permanecem nesta seção enquanto estiverem em análise. Depois de decididas, serão registradas como premissas do projeto.
+As premissas poderão ser revisadas caso a validação do algoritmo revele inconsistências ou novos cenários não considerados.
 
 ---
 
@@ -62,10 +62,6 @@ O alcance máximo passa a representar o percurso completo da missão e permite r
 
 A distância total será calculada pela soma de todos os trechos percorridos desde a saída da base até o retorno.
 
-**Observação**
-
-A estratégia utilizada para definir a ordem dos destinos ainda será definida.
-
 ---
 
 ### Nível de otimização do MVP
@@ -108,27 +104,137 @@ Um pedido inviável não deve comprometer toda a simulação.
 
 **Decisão**
 
-Os pedidos serão inicialmente considerados em ordem de prioridade (Alta → Média → Baixa). Essa ordenação representa o critério inicial para o planejamento das entregas.
+A prioridade será considerada durante o planejamento das entregas.
 
-Pedidos com prioridades diferentes poderão ser agrupados na mesma viagem, desde que as demais restrições de peso e alcance sejam respeitadas.
+Pedidos com prioridades diferentes poderão ser agrupados na mesma viagem, desde que as restrições de peso e alcance sejam respeitadas.
+
+A prioridade também será utilizada nos critérios de desempate definidos para a seleção de pedidos e para a ordenação dos destinos.
 
 **Justificativa**
 
-Essa abordagem mantém a prioridade como um critério relevante para o planejamento sem impedir o aproveitamento da capacidade dos drones ou aumentar desnecessariamente o número de viagens.
+Essa abordagem mantém a urgência como um critério relevante sem impedir o aproveitamento da capacidade dos drones ou aumentar desnecessariamente o número de viagens.
 
 ---
 
-## Questões em aberto
+### Escolha do primeiro pedido da viagem
+
+**Decisão**
+
+Os pedidos serão inicialmente considerados em ordem de prioridade.
+
+Cada nova viagem será iniciada pelo pedido de maior peso dentro da maior prioridade ainda disponível.
+
+**Justificativa**
+
+A prioridade permanece como o critério principal do planejamento, enquanto o peso é utilizado como critério secundário para tratar primeiro os pedidos mais difíceis de acomodar na capacidade dos drones.
+
+---
+
+### Agrupamento de pedidos em uma viagem
+
+**Decisão**
+
+Depois da escolha do primeiro pedido, novos pedidos poderão ser incluídos enquanto a capacidade de peso e o alcance máximo do drone forem respeitados.
+
+Para cada pedido candidato, sua inclusão será simulada temporariamente. A rota do conjunto resultante será recalculada utilizando a heurística do vizinho mais próximo.
+
+Entre os candidatos válidos, será escolhido aquele que provocar o menor aumento na distância total da viagem.
+
+Um pedido considerado inválido durante a formação de uma viagem continuará pendente e poderá ser avaliado novamente em outra viagem ou com outro drone.
+
+**Critérios de desempate**
+
+Em caso de empate no aumento da distância, será utilizada a seguinte ordem:
+
+1. maior prioridade
+2. maior peso
+3. menor ordem de entrada
+4. menor identificador
+
+**Justificativa**
+
+A avaliação utiliza a mesma estratégia de roteamento que será adotada pela viagem, evitando selecionar um pedido com base em uma rota diferente daquela utilizada para validar o alcance.
+
+---
 
 ### Ordem de visita dos destinos
 
-Embora a distância total da viagem já tenha sido definida, ainda não foi estabelecida a estratégia para ordenar os destinos.
+**Decisão**
 
-Questões:
+A ordem de visita dos destinos será definida pela heurística do vizinho mais próximo.
 
-- Os destinos serão visitados por proximidade?
-- Será utilizada uma estratégia de vizinho mais próximo?
-- A prioridade influenciará essa ordem?
-- Como serão resolvidos empates?
+A rota será iniciada na base. Em cada etapa, será escolhido o destino ainda não visitado mais próximo da posição atual. Depois que todos os destinos forem atendidos, o drone retornará à base.
 
-**Status:** Em análise.
+**Justificativa**
+
+A heurística é simples de implementar, compreender e testar. Embora não garanta a menor rota possível, tende a produzir rotas razoáveis sem exigir a avaliação de todas as combinações de destinos.
+
+---
+
+### Momento de recálculo da rota
+
+**Decisão**
+
+A rota será simulada novamente durante a avaliação de cada pedido candidato.
+
+Depois que o candidato vencedor for escolhido, a rota simulada correspondente passará a ser a rota oficial da viagem.
+
+**Justificativa**
+
+Essa abordagem mantém a seleção dos pedidos, o cálculo da distância e a validação do alcance baseados na mesma heurística.
+
+Apesar de executar o cálculo do vizinho mais próximo várias vezes, sua complexidade é aceitável para o volume esperado no MVP.
+
+---
+
+### Encerramento de uma viagem
+
+**Decisão**
+
+A viagem será encerrada quando:
+
+- não houver mais pedidos disponíveis; ou
+- nenhum pedido restante puder ser incluído sem ultrapassar a capacidade de peso ou o alcance máximo do drone, considerando o retorno à base.
+
+**Justificativa**
+
+A viagem continua recebendo pedidos enquanto existir uma inclusão válida, sem depender de percentuais arbitrários de ocupação ou limites artificiais de aumento da distância.
+
+---
+
+### Limitações da estratégia de planejamento
+
+A estratégia adotada é heurística e não oferece garantia matemática de solução ótima.
+
+Em particular:
+
+- o vizinho mais próximo não garante a menor rota possível;
+- a escolha sucessiva do menor aumento de distância não garante o menor número global de viagens;
+- a qualidade do resultado pode depender da ordem inicial dos pedidos e dos critérios de desempate.
+
+Essas limitações são consideradas aceitáveis para o MVP, cujo objetivo é apresentar uma solução simples, previsível e defensável.
+
+---
+
+### Desempate na heurística do vizinho mais próximo
+
+**Decisão**
+
+Quando dois ou mais destinos não visitados estiverem à mesma distância da posição atual do drone, será utilizada a seguinte ordem de desempate:
+
+1. maior prioridade;
+2. menor ordem de entrada;
+3. maior peso;
+4. menor identificador.
+
+**Justificativa**
+
+A prioridade preserva a urgência dos pedidos quando não existe diferença logística entre os destinos.
+
+A ordem de entrada evita que pedidos mais antigos sejam ultrapassados sem necessidade e mantém o comportamento previsível.
+
+O peso é utilizado como critério secundário para preservar a consistência com a estratégia geral de tratar primeiro os pacotes mais difíceis de acomodar. Embora ele não altere diretamente a distância da rota, sua utilização ocorre apenas depois dos critérios de prioridade e ordem de entrada.
+
+O identificador é utilizado como último critério para garantir que empates completos sempre produzam o mesmo resultado.
+
+---

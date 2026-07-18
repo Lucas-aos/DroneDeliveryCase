@@ -1,6 +1,6 @@
 # Diário de Desenvolvimento
 
-## Sessão 1
+## Sessão 1 - Análise iniciald o desafio
 
 ### Objetivo
 
@@ -23,7 +23,7 @@ Foi realizada a análise inicial do enunciado, identificando requisitos, diferen
 - Existem regras obrigatórias.
 - Existem diferenciais.
 - Existem funcionalidades opcionais.
-- Foram identificadas as principais decisões necessárias para definir o comportamento do MVP.
+- Foram identificadas as principais decisões necessárias para definir o comportamento do MVP (Minimun Viable Product).
 - Ainda existem ambiguidades importantes que precisam ser resolvidas antes da modelagem.
 
 ### Próximo passo
@@ -32,7 +32,7 @@ Analisar as ambiguidades do enunciado, avaliar as alternativas para cada uma del
 
 ---
 
-## Sessão 2
+## Sessão 2 - Definição das premissas do MVP
 
 ### Objetivo
 
@@ -72,3 +72,62 @@ Foram avaliadas diferentes alternativas para os principais pontos não especific
 ### Próximo passo
 
 Definir a estratégia de ordenação dos destinos dentro de uma viagem e os critérios de desempate antes de iniciar a modelagem da solução.
+
+---
+
+## Sessão 3 — Definição da estratégia de planejamento
+
+### Objetivo
+
+Definir a heurística utilizada para formar viagens, selecionar pedidos adicionais, organizar os destinos e validar o alcance dos drones.
+
+### Resultado
+
+Foi definida a estratégia completa de formação das viagens, incluindo a escolha do primeiro pedido, a avaliação de candidatos, o recálculo da rota, os critérios de desempate, a validação das restrições e as condições de encerramento.
+
+### Atividades realizadas
+
+- Comparação de alternativas para escolha do primeiro pedido da viagem
+- Análise de critérios para agrupamento de pedidos
+- Definição da heurística do vizinho mais próximo para organização da rota
+- Análise da relação entre seleção de candidatos e recálculo da rota
+- Comparação entre avaliação pela ordem atual, melhor inserção e recálculo completo da heurística
+- Definição das condições de encerramento de uma viagem
+- Identificação das limitações da estratégia escolhida.
+
+### Decisões tomadas
+
+- Os pedidos são inicialmente considerados por prioridade
+- Uma viagem começa pelo pedido mais pesado dentro da maior prioridade disponível
+- Cada pedido candidato é incluído temporariamente para avaliação
+- A rota temporária é recalculada utilizando o vizinho mais próximo
+- O cálculo da distância inclui o retorno à base
+- Candidatos que ultrapassarem peso ou alcance são desconsiderados para a viagem atual, mas permanecem pendentes para avaliações posteriores.
+- Entre os candidatos válidos, é escolhido o que produzir o menor aumento de distância
+- Os desempates entre candidatos seguem maior prioridade, maior peso, menor ordem de entrada e menor identificador.
+- A rota simulada do candidato escolhido torna-se a rota oficial da viagem
+- A viagem termina quando nenhum pedido adicional puder ser incluído validamente.
+
+### Limitações reconhecidas
+
+- O vizinho mais próximo não garante a menor rota
+- A escolha local do menor aumento não garante o menor número global de viagens
+- A heurística poderá executar vários recálculos de rota
+- O custo adicional é considerado aceitável para o volume esperado no MVP.
+
+### Decisão complementar
+
+Foi definido que empates durante a execução da heurística do vizinho mais próximo serão resolvidos pela seguinte ordem:
+
+1. Maior prioridade
+2. Menor ordem de entrada
+3. Maior peso
+4. Menor identificador.
+
+A prioridade preserva a urgência dos pedidos, enquanto a ordem de entrada favorece previsibilidade e evita ultrapassagens desnecessárias.
+
+O peso foi mantido como terceiro critério para preservar a consistência com a estratégia geral de tratar pacotes mais pesados mais cedo. O identificador será utilizado apenas para garantir determinismo em caso de empate completo.
+
+### Próximo passo
+
+Descrever o algoritmo completo de planejamento em linguagem natural. Em seguida, validar seu comportamento por meio de cenários pequenos antes de iniciar a modelagem técnica.
