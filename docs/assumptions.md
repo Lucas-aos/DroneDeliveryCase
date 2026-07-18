@@ -122,17 +122,34 @@ Essa abordagem mantém a urgência como um critério relevante sem impedir o apr
 
 **Decisão**
 
-Os pedidos serão inicialmente considerados em ordem de prioridade.
+Entre os pedidos pendentes que possam ser atendidos individualmente pelo drone selecionado, será considerada primeiro a maior prioridade disponível.
 
-Cada nova viagem será iniciada pelo pedido de maior peso dentro da maior prioridade ainda disponível.
+Dentro dessa prioridade, a viagem será iniciada pelo pedido de maior peso.
+
+Em caso de empate, serão utilizados, nesta ordem:
+
+- menor ordem de entrada
+- menor identificador
+
+A ordem de entrada dos pedidos será estável e única durante todo o planejamento.
 
 **Justificativa**
 
-A prioridade permanece como o critério principal do planejamento, enquanto o peso é utilizado como critério secundário para tratar primeiro os pedidos mais difíceis de acomodar na capacidade dos drones.
+A prioridade permanece como principal critério do planejamento.
 
-**Pendência**
+O peso é utilizado como critério secundário porque pedidos mais pesados tendem a ser mais difíceis de acomodar dentro das restrições de capacidade do drone.
 
-Ainda deve ser definido o critério de desempate quando dois ou mais pedidos atendíveis possuírem a mesma prioridade e o mesmo peso.
+Após esses critérios, a menor ordem de entrada preserva previsibilidade entre pedidos equivalentes.
+
+O identificador é utilizado apenas para garantir determinismo em caso de empate completo.
+
+**Limitação conhecida**
+
+A ordem de entrada não representa eficiência logística.
+
+Alterações na sequência original dos pedidos podem modificar a formação das viagens, mesmo mantendo os mesmos dados de entrada.
+
+Essa limitação é considerada aceitável para o escopo do MVP.
 
 ---
 
@@ -226,22 +243,32 @@ Essas limitações são consideradas aceitáveis para o MVP, cujo objetivo é ap
 
 **Decisão**
 
-Quando dois ou mais destinos não visitados estiverem à mesma distância da posição atual do drone, será utilizada a seguinte ordem de desempate:
+Quando dois ou mais destinos não visitados estiverem exatamente à mesma distância da posição atual do drone, serão utilizados, nesta ordem:
 
-1. maior prioridade;
-2. menor ordem de entrada;
-3. maior peso;
-4. menor identificador.
+- maior prioridade
+- menor ordem de entrada
+- maior peso
+- menor identificador
 
 **Justificativa**
 
-A prioridade preserva a urgência dos pedidos quando não existe diferença logística entre os destinos.
+Nesse momento do planejamento, todos os pedidos já pertencem à viagem.
 
-A ordem de entrada evita que pedidos mais antigos sejam ultrapassados sem necessidade e mantém o comportamento previsível.
+Assim, o peso individual deixa de influenciar a capacidade do drone ou a composição da viagem.
 
-O peso é utilizado como critério secundário para preservar a consistência com a estratégia geral de tratar primeiro os pacotes mais difíceis de acomodar. Embora ele não altere diretamente a distância da rota, sua utilização ocorre apenas depois dos critérios de prioridade e ordem de entrada.
+Após preservar a prioridade, a menor ordem de entrada mantém um comportamento previsível entre destinos logisticamente equivalentes.
 
-O identificador é utilizado como último critério para garantir que empates completos sempre produzam o mesmo resultado.
+O peso permanece como critério secundário apenas para manter determinismo quando ainda existir empate.
+
+O identificador é utilizado como último recurso para eliminar empates completos.
+
+**Observação**
+
+Os critérios de desempate utilizados durante a formação da viagem não são exatamente os mesmos da heurística do vizinho mais próximo porque cada etapa possui objetivos diferentes.
+
+Durante a formação da viagem, o peso possui maior relevância por influenciar a dificuldade de acomodação dos pedidos.
+
+Durante o roteamento, os pedidos já foram selecionados, tornando mais apropriado priorizar previsibilidade entre destinos equivalentes.
 
 ---
 
