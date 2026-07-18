@@ -1,6 +1,6 @@
 # Diário de Desenvolvimento
 
-## Sessão 1 - Análise iniciald o desafio
+## Sessão 1 - Análise inicial do desafio
 
 ### Objetivo
 
@@ -83,7 +83,9 @@ Definir a heurística utilizada para formar viagens, selecionar pedidos adiciona
 
 ### Resultado
 
-Foi definida a estratégia completa de formação das viagens, incluindo a escolha do primeiro pedido, a avaliação de candidatos, o recálculo da rota, os critérios de desempate, a validação das restrições e as condições de encerramento.
+Foi definida a estratégia principal de formação das viagens, incluindo a escolha inicial por prioridade e peso, a avaliação de candidatos, o recálculo da rota, os critérios de desempate durante o agrupamento e o roteamento, a validação das restrições e as condições de encerramento.
+
+Permaneceram pendentes a política de seleção dos drones e o desempate completo para escolha do primeiro pedido de cada viagem.
 
 ### Atividades realizadas
 
@@ -131,3 +133,55 @@ O peso foi mantido como terceiro critério para preservar a consistência com a 
 ### Próximo passo
 
 Descrever o algoritmo completo de planejamento em linguagem natural. Em seguida, validar seu comportamento por meio de cenários pequenos antes de iniciar a modelagem técnica.
+
+---
+
+## Sessão 4 — Especificação funcional do algoritmo
+
+### Objetivo
+
+Transformar as decisões da estratégia de planejamento em uma especificação funcional única, identificar lacunas restantes e consolidar as regras necessárias para uma implementação determinística.
+
+### Resultado parcial
+
+A descrição do algoritmo revelou decisões que ainda não estavam completamente definidas.
+
+Foi consolidada a política de seleção e reutilização dos drones. Permanece pendente o desempate completo para escolha do primeiro pedido de cada viagem.
+
+### Atividades realizadas
+
+- Organização das regras de planejamento em um fluxo funcional único.
+- Identificação das informações que precisam ser mantidas durante o planejamento.
+- Definição do momento em que um pedido deixa de ser considerado pendente.
+- Análise da transição entre o encerramento de uma viagem e a criação da seguinte.
+- Identificação de lacunas funcionais ainda existentes.
+- Comparação de políticas simples para escolha dos drones.
+- Definição e validação da política de seleção e reutilização dos drones.
+
+### Decisão — Seleção e reutilização dos drones
+
+Antes de cada nova viagem, serão identificados os drones capazes de atender individualmente pelo menos um pedido ainda pendente, considerando simultaneamente capacidade de peso e alcance de ida e retorno à base.
+
+Entre os drones elegíveis, será escolhido aquele de maior capacidade de peso.
+
+Em caso de empate, serão utilizados, nesta ordem:
+
+1. maior alcance;
+2. menor ordem de entrada;
+3. menor identificador, quando aplicável.
+
+A seleção será repetida antes de cada nova viagem. Todos os drones elegíveis voltarão a participar da escolha, permitindo que um mesmo drone realize viagens consecutivas e seja reutilizado sem limite.
+
+Não haverá rodízio, balanceamento, reserva de drones ou preferência por drones ainda não utilizados.
+
+### Justificativa
+
+A política é simples, determinística e alinhada ao objetivo de favorecer o agrupamento de pedidos. Entretanto, por ser heurística, não garante o menor número global de viagens quando capacidade de peso e alcance favorecem drones diferentes.
+
+### Pendência atual
+
+Definir o desempate para escolha do primeiro pedido quando dois ou mais pedidos atendíveis possuírem a mesma prioridade e o mesmo peso.
+
+### Próximo passo
+
+Comparar alternativas simples para o desempate do primeiro pedido e consolidar a especificação funcional antes da validação por cenários.

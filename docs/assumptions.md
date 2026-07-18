@@ -80,11 +80,13 @@ Essa abordagem mantém a implementação compatível com um projeto de estágio.
 
 **Decisão**
 
-Um mesmo drone poderá realizar várias viagens durante a simulação.
+Um mesmo drone poderá realizar várias viagens durante o planejamento e a simulação.
+
+A política completa de seleção e reutilização está descrita na seção “Política de seleção e reutilização dos drones”.
 
 **Justificativa**
 
-O enunciado não estabelece limite de viagens nem simulação de tempo ou recarga.
+O enunciado não estabelece limite de viagens e o MVP não considera indisponibilidade provocada por recarga, desgaste ou tempo de operação.
 
 ---
 
@@ -127,6 +129,10 @@ Cada nova viagem será iniciada pelo pedido de maior peso dentro da maior priori
 **Justificativa**
 
 A prioridade permanece como o critério principal do planejamento, enquanto o peso é utilizado como critério secundário para tratar primeiro os pedidos mais difíceis de acomodar na capacidade dos drones.
+
+**Pendência**
+
+Ainda deve ser definido o critério de desempate quando dois ou mais pedidos atendíveis possuírem a mesma prioridade e o mesmo peso.
 
 ---
 
@@ -236,5 +242,40 @@ A ordem de entrada evita que pedidos mais antigos sejam ultrapassados sem necess
 O peso é utilizado como critério secundário para preservar a consistência com a estratégia geral de tratar primeiro os pacotes mais difíceis de acomodar. Embora ele não altere diretamente a distância da rota, sua utilização ocorre apenas depois dos critérios de prioridade e ordem de entrada.
 
 O identificador é utilizado como último critério para garantir que empates completos sempre produzam o mesmo resultado.
+
+---
+
+## Política de seleção e reutilização dos drones
+
+### Decisão
+
+Antes de iniciar cada nova viagem, o planejamento identifica os drones capazes de atender individualmente pelo menos um pedido ainda pendente, respeitando simultaneamente:
+
+- a capacidade máxima de peso;
+- o alcance necessário para sair da base, chegar ao destino do pedido e retornar à base.
+
+Entre os drones elegíveis, será escolhido aquele com maior capacidade de peso.
+
+Em caso de empate, serão utilizados, nesta ordem:
+
+1. maior alcance;
+2. menor ordem de entrada;
+3. menor identificador, caso aplicável.
+
+A ordem de entrada dos drones será estável e única durante o planejamento.
+
+A seleção será repetida antes de cada nova viagem. Todos os drones elegíveis voltam a ser considerados, permitindo que um mesmo drone seja escolhido em viagens consecutivas e reutilizado sem limite.
+
+Não haverá rodízio, balanceamento, reserva de drones ou preferência por drones ainda não utilizados.
+
+### Justificativa
+
+A priorização do drone com maior capacidade de peso aumenta o potencial de agrupamento de pedidos e está alinhada ao objetivo principal de reduzir a quantidade de viagens.
+
+A estratégia permanece simples, determinística, testável e adequada ao escopo do MVP.
+
+### Limitação conhecida
+
+A política é heurística e não garante o menor número global de viagens. Em especial, um drone com maior capacidade de peso pode ter alcance inferior ao de outro drone e produzir um planejamento menos eficiente em determinados cenários.
 
 ---
