@@ -233,3 +233,62 @@ Essa decisão evita aplicar um mesmo critério em contextos cuja finalidade é d
 ### Próximo passo
 
 Validar a especificação funcional por meio de cenários representativos e, após sua aprovação, iniciar a modelagem técnica e a implementação.
+
+---
+
+## Sessão 5 — Modelagem conceitual do domínio
+
+### Objetivo
+
+Definir a estrutura conceitual do domínio antes da implementação, identificando os principais objetos, suas responsabilidades e seus relacionamentos, mantendo uma arquitetura simples e adequada ao escopo do MVP.
+
+### Resultado
+
+Foi concluída a modelagem conceitual do domínio, consolidada no documento `domain-model.md` e em seu respectivo diagrama de classes conceitual.
+
+A modelagem foi refinada para representar apenas os conceitos essenciais do problema, separando claramente objetos do domínio, resultados do planejamento e componentes responsáveis pelo comportamento do algoritmo.
+
+### Atividades realizadas
+
+- Identificação dos principais objetos do domínio.
+- Definição das responsabilidades de cada objeto.
+- Definição dos relacionamentos entre os objetos.
+- Avaliação da separação entre dados do domínio e componentes de comportamento.
+- Revisão da modelagem para reduzir complexidade desnecessária.
+- Comparação entre manter ou remover o objeto `Route`.
+- Definição da representação dos pedidos impossíveis.
+- Definição da prioridade como conjunto fechado de valores.
+- Elaboração da documentação `domain-model.md`.
+- Elaboração do diagrama de classes conceitual.
+
+### Decisões tomadas
+
+- O domínio será representado pelos objetos `Drone`, `Order`, `Coordinate`, `Trip`, `PlanningResult` e `ImpossibleOrder`.
+- O objeto `Route` foi removido da modelagem por duplicar informações já representadas em `Trip`.
+- A ordem da rota será representada pela sequência dos pedidos armazenados em cada viagem.
+- A prioridade será representada por um conjunto fechado de valores (`High`, `Medium` e `Low`).
+- Os pedidos impossíveis serão representados juntamente com o motivo da impossibilidade.
+- O componente `TripPlanner` coordenará o fluxo do algoritmo.
+- O cálculo de distância permanecerá isolado em `DistanceCalculator`.
+- O recálculo da rota utilizando a heurística do Vizinho Mais Próximo será responsabilidade de `NearestNeighborRouteCalculator`.
+
+### Limitações reconhecidas
+
+- A modelagem representa apenas o domínio do problema, sem considerar persistência, API ou infraestrutura.
+- Não foram introduzidas abstrações voltadas para extensões futuras que não façam parte do escopo do MVP.
+- A distribuição definitiva das responsabilidades poderá sofrer pequenos ajustes durante a implementação, desde que preserve a estrutura conceitual definida.
+
+### Principais conclusões
+
+- A modelagem cobre todos os conceitos necessários para implementar a especificação funcional.
+- As responsabilidades dos objetos foram definidas de forma clara e com baixo acoplamento.
+- O domínio foi mantido independente de detalhes de infraestrutura.
+- A documentação conceitual servirá como referência para a implementação das classes em C#.
+
+### Lições aprendidas
+
+A modelagem conceitual mostrou que representar corretamente o domínio é diferente de projetar a implementação. Antes de definir métodos, padrões ou detalhes técnicos, foi necessário identificar quais conceitos realmente pertencem ao problema de negócio e quais responsabilidades cada objeto deve assumir.
+
+### Próximo passo
+
+Projetar o modelo de implementação, definindo como os conceitos do domínio serão representados em C#, suas estruturas, tipos, encapsulamento e componentes de comportamento antes do início da implementação.
