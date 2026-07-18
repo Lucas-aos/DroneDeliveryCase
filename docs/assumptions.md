@@ -6,131 +6,129 @@ As questões permanecem nesta seção enquanto estiverem em análise. Depois de 
 
 ---
 
-## Questões em aberto
+## Premissas definidas
 
-### Utilização da prioridade
+### Composição de uma viagem
 
-A forma como a prioridade influenciará o planejamento das entregas ainda não foi definida.
+**Decisão**
 
-Questões:
+Uma viagem poderá atender vários pedidos e visitar vários destinos.
 
-- A prioridade define a ordem de processamento dos pedidos?
-- Ela será utilizada apenas como critério de desempate?
-- Ela participará de uma pontuação de alocação?
-- Pedidos com prioridades diferentes poderão ser agrupados na mesma viagem?
+**Justificativa**
 
-**Status:** Em análise.
+O objetivo do desafio é reduzir a quantidade de viagens. Permitir o agrupamento de pedidos está alinhado com esse objetivo.
 
 ---
 
 ### Fórmula de cálculo da distância
 
-A forma de calcular a distância entre duas coordenadas ainda não foi definida.
+**Decisão**
 
-Questões:
+Será utilizada a distância euclidiana entre dois pontos.
 
-- Será utilizada distância euclidiana?
-- Será utilizada distância Manhattan?
-- As coordenadas representarão quilômetros ou unidades abstratas?
+**Justificativa**
 
-**Status:** Em análise.
+As coordenadas fornecidas representam posições em um plano cartesiano e drones podem ser modelados como deslocando-se em linha reta no MVP.
 
 ---
 
 ### Localização da base
 
-O ponto de origem dos drones ainda não foi definido.
+**Decisão**
 
-Questões:
+Todos os drones partirão de uma única base localizada na coordenada `(0,0)`.
 
-- Todos os drones partirão da coordenada `(0,0)`?
-- A base terá coordenadas configuráveis?
-- Todos os drones utilizarão a mesma base?
+**Justificativa**
 
-**Status:** Em análise.
+O enunciado não define uma origem. Utilizar `(0,0)` fornece uma referência única para todos os cálculos.
 
 ---
 
 ### Retorno do drone à base
 
-Ainda não foi definido se o alcance da viagem deve incluir o retorno do drone.
+**Decisão**
 
-Questões:
+Toda viagem deverá terminar com o retorno do drone à base.
 
-- O drone deverá retornar à base ao final de toda viagem?
-- O alcance considerará somente o trajeto de ida?
-- Em uma viagem com vários destinos, o retorno será calculado a partir do último destino?
+**Justificativa**
 
-**Status:** Em análise.
-
----
-
----
-
-### Composição de uma viagem
-
-Ainda não foi definido quantos pedidos e destinos podem fazer parte de uma viagem.
-
-Questões:
-
-- Uma viagem pode atender vários pedidos?
-- Uma viagem pode visitar vários destinos?
-- A ordem de visita fará parte do planejamento?
-
-**Status:** Em análise.
+O alcance máximo passa a representar o percurso completo da missão e permite reutilizar o drone em viagens posteriores.
 
 ---
 
 ### Distância total de uma viagem
 
-Ainda não foi definido como calcular o percurso quando uma viagem contém vários destinos.
+**Decisão**
 
-Questões:
+A distância total será calculada pela soma de todos os trechos percorridos desde a saída da base até o retorno.
 
-- A distância será a soma dos trechos percorridos?
-- Qual regra definirá a ordem dos destinos?
-- Será utilizada uma estratégia simples de proximidade?
+**Observação**
 
-**Status:** Em análise.
+A estratégia utilizada para definir a ordem dos destinos ainda será definida.
 
 ---
 
 ### Nível de otimização do MVP
 
-Ainda não foi definido o nível de otimização esperado para reduzir o número de viagens.
+**Decisão**
 
-Questões:
+O MVP utilizará uma estratégia heurística simples para reduzir o número de viagens, sem garantir uma solução ótima.
 
-- O MVP utilizará uma estratégia gulosa simples?
-- Será necessário testar várias combinações de pacotes?
-- A solução garantirá o resultado matematicamente ótimo ou apenas uma boa solução?
+**Justificativa**
 
-**Status:** Em análise.
+Essa abordagem mantém a implementação compatível com um projeto de estágio.
 
 ---
 
 ### Realização de várias viagens
 
-Ainda não foi definido se um drone poderá executar mais de uma viagem durante a simulação.
+**Decisão**
 
-Questões:
+Um mesmo drone poderá realizar várias viagens durante a simulação.
 
-- Cada drone poderá realizar várias viagens?
-- Existirá algum limite de viagens?
-- O tempo e a disponibilidade serão considerados no MVP?
+**Justificativa**
 
-**Status:** Em análise.
+O enunciado não estabelece limite de viagens nem simulação de tempo ou recarga.
 
 ---
 
 ### Pedidos impossíveis de atender
 
-Ainda não foi definido o comportamento para pedidos que excedam o peso ou o alcance de todos os drones.
+**Decisão**
+
+Pedidos impossíveis serão identificados e apresentados separadamente, sem impedir o processamento dos demais pedidos.
+
+**Justificativa**
+
+Um pedido inviável não deve comprometer toda a simulação.
+
+---
+
+### Utilização da prioridade
+
+**Decisão**
+
+Os pedidos serão inicialmente considerados em ordem de prioridade (Alta → Média → Baixa). Essa ordenação representa o critério inicial para o planejamento das entregas.
+
+Pedidos com prioridades diferentes poderão ser agrupados na mesma viagem, desde que as demais restrições de peso e alcance sejam respeitadas.
+
+**Justificativa**
+
+Essa abordagem mantém a prioridade como um critério relevante para o planejamento sem impedir o aproveitamento da capacidade dos drones ou aumentar desnecessariamente o número de viagens.
+
+---
+
+## Questões em aberto
+
+### Ordem de visita dos destinos
+
+Embora a distância total da viagem já tenha sido definida, ainda não foi estabelecida a estratégia para ordenar os destinos.
 
 Questões:
 
-- Os demais pedidos continuarão sendo processados?
-- Os pedidos impossíveis serão listados separadamente?
-- A simulação inteira deverá ser rejeitada?
+- Os destinos serão visitados por proximidade?
+- Será utilizada uma estratégia de vizinho mais próximo?
+- A prioridade influenciará essa ordem?
+- Como serão resolvidos empates?
 
 **Status:** Em análise.
