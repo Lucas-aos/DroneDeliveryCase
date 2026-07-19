@@ -1480,3 +1480,95 @@ Com a infraestrutura estabilizada, as próximas etapas poderão se concentrar ex
 ### Próximo passo
 
 Iniciar a criação dos contratos (`Requests` e `Responses`) que serão utilizados pela API, mantendo a separação entre a camada HTTP e o domínio.
+
+---
+
+## Sessão 25 — Definição dos contratos públicos da API
+
+### Objetivo
+
+Definir conceitualmente os contratos de entrada e saída da API antes de iniciar sua implementação em C#.
+
+### Resultado
+
+Foram definidos os DTOs que formarão a interface pública da API, mantendo-os separados das entidades da camada de domínio.
+
+Também foram congeladas as propriedades que serão expostas no JSON e as responsabilidades da futura camada de mapeamento.
+
+### Contratos de entrada
+
+#### `PlanningRequest`
+
+- `Drones`
+- `Orders`
+
+#### `DroneRequest`
+
+- `Id`
+- `CapacityKg`
+- `RangeKm`
+
+#### `OrderRequest`
+
+- `Id`
+- `WeightKg`
+- `Priority`
+- `X`
+- `Y`
+
+### Contratos de saída
+
+#### `PlanningResponse`
+
+- `Trips`
+- `ImpossibleOrders`
+
+#### `TripResponse`
+
+- `DroneId`
+- `Orders`
+- `TotalWeightKg`
+- `TotalDistanceKm`
+
+#### `TripOrderResponse`
+
+- `Id`
+- `Sequence`
+
+#### `ImpossibleOrderResponse`
+
+- `OrderId`
+- `Reason`
+
+#### `ErrorResponse`
+
+- `Message`
+- `Errors`
+
+### Decisões tomadas
+
+- manter os contratos da API separados das entidades de domínio;
+- representar `Priority` como texto no contrato HTTP;
+- representar `Reason` como texto na resposta;
+- manter `Sequence` explícita em cada pedido da viagem;
+- não expor `InputOrder` no JSON;
+- inferir `InputOrder` pela posição dos elementos nos arrays recebidos;
+- deixar a conversão dos contratos para o domínio sob responsabilidade da futura camada de mapeamento.
+
+### Principais conclusões
+
+O contrato público deve representar a intenção de quem consome a API, sem expor detalhes internos do algoritmo.
+
+A ordem dos drones e pedidos nos arrays já fornece informação suficiente para gerar o `InputOrder`, evitando campos redundantes e possíveis inconsistências na requisição.
+
+### Validação
+
+- ✅ contratos de entrada definidos;
+- ✅ contratos de saída definidos;
+- ✅ propriedades públicas aprovadas;
+- ✅ nenhuma implementação antecipada;
+- ✅ domínio mantido independente da camada HTTP.
+
+### Próximo passo
+
+Definir o padrão de implementação dos DTOs em C#, comparando `class`, `record`, propriedades `init` e construtores posicionais antes de criar os arquivos dos contratos.
