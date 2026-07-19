@@ -902,3 +902,54 @@ Implementar primeiro as validações estruturais reduz a complexidade das etapas
 ### Próximo passo
 
 Implementar a identificação de pedidos impossíveis e iniciar a primeira versão da formação de viagens utilizando os componentes de planejamento já desenvolvidos.
+
+---
+
+## Sessão 16 — Identificação de pedidos impossíveis
+
+### Objetivo
+
+Ampliar o `TripPlanner` para identificar pedidos individualmente inviáveis antes da formação das viagens, classificando corretamente o motivo da impossibilidade conforme as restrições de peso e alcance da frota.
+
+### Resultado
+
+Foi implementada a identificação de pedidos impossíveis, considerando a distância de ida e volta entre a base e o destino e classificando cada pedido como:
+
+- `WeightExceeded`;
+- `RangeExceeded`;
+- `WeightAndRangeExceeded`.
+
+Também foi adotada a regra de que um pedido somente é considerado viável quando um mesmo drone atende simultaneamente aos requisitos de peso e alcance. Caso essas capacidades existam apenas em drones diferentes, o pedido permanece impossível.
+
+A suíte completa passou a conter **118 testes aprovados**.
+
+### Atividades realizadas
+
+- Implementação da identificação de pedidos impossíveis;
+- cálculo do alcance necessário considerando ida e volta;
+- implementação da classificação dos motivos de impossibilidade;
+- tratamento do cenário em que todos os pedidos são impossíveis;
+- manutenção do `NotSupportedException` quando ainda existem pedidos viáveis aguardando a implementação da formação das viagens;
+- criação dos testes unitários para todos os cenários de classificação;
+- validação completa da suíte de testes e do build da solution.
+
+### Decisões tomadas
+
+- A viabilidade de um pedido depende da existência de um único drone capaz de atender simultaneamente aos requisitos de peso e alcance.
+- A existência de capacidade em um drone e alcance em outro não torna o pedido viável.
+- Quando todos os pedidos são impossíveis, o `PlanningResult` já é retornado corretamente.
+- Quando ainda existem pedidos viáveis, a formação das viagens permanece pendente e o método continua lançando `NotSupportedException`.
+
+### Principais conclusões
+
+- O `TripPlanner` passou a executar uma etapa real do algoritmo de planejamento.
+- A identificação de pedidos inviáveis tornou-se independente da futura formação das viagens.
+- A regra de classificação ficou completamente coberta por testes automatizados.
+
+### Lições aprendidas
+
+Separar a identificação de pedidos impossíveis da lógica de formação das viagens reduz a complexidade do algoritmo e elimina a necessidade de reavaliar pedidos cuja inviabilidade depende apenas das características da frota disponível.
+
+### Próximo passo
+
+Implementar a primeira formação de viagens para os pedidos viáveis, iniciando pela seleção do drone e do primeiro pedido da rota.

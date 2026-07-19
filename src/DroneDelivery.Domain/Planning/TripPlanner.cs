@@ -1,9 +1,14 @@
-﻿using DroneDelivery.Domain.Entities;
+﻿using DroneDelivery.Domain.Calculations;
+using DroneDelivery.Domain.Entities;
+using DroneDelivery.Domain.Enums;
+using DroneDelivery.Domain.ValueObjects;
 
 namespace DroneDelivery.Domain.Planning;
 
 public class TripPlanner
 {
+    private static readonly Coordinate BaseCoordinate = new(0, 0);
+
     public PlanningResult Plan(
         IEnumerable<Drone> drones,
         IEnumerable<Order> orders)
@@ -34,9 +39,79 @@ public class TripPlanner
                 nameof(drones));
         }
 
+        var impossibleOrders = IdentifyImpossibleOrders(
+            droneList,
+            orderList);
+
+        if (impossibleOrders.Count == orderList.Count)
+        {
+            return new PlanningResult(
+                Array.Empty<Trip>(),
+                impossibleOrders);
+        }
+
         throw new NotSupportedException(
-            "Planning trips for non-empty drone and order collections " +
-            "has not been implemented yet.");
+            "Trip formation for feasible orders has not been implemented yet.");
+    }
+
+    private static List<ImpossibleOrder> IdentifyImpossibleOrders(
+        IReadOnlyCollection<Drone> drones,
+        IEnumerable<Order> orders)
+    {
+        var impossibleOrders = new List<ImpossibleOrder>();
+
+        foreach (var order in orders)
+        {
+            var outboundDistanceKm = DistanceCalculator.Calculate(
+                BaseCoordinate,
+                order.Destination);
+
+            var requiredRangeKm = outboundDistanceKm * 2;
+
+            var hasDroneWithSufficientWeight = drones.Any(
+                drone => drone.CapacityKg >= order.WeightKg);
+
+            var hasDroneWithSufficientRange = drones.Any(
+                drone => drone.RangeKm >= requiredRangeKm);
+
+            var hasCompatibleDrone = drones.Any(
+                drone =>
+                    drone.CapacityKg >= order.WeightKg
+                    && drone.RangeKm >= requiredRangeKm);
+
+            if (hasCompatibleDrone)
+            {
+                continue;
+            }
+
+            var reason = DetermineImpossibleReason(
+                hasDroneWithSufficientWeight,
+                hasDroneWithSufficientRange);
+
+            impossibleOrders.Add(
+                new ImpossibleOrder(order, reason));
+        }
+
+        return impossibleOrders;
+    }
+
+    private static ImpossibleReason DetermineImpossibleReason(
+        bool hasDroneWithSufficientWeight,
+        bool hasDroneWithSufficientRange)
+    {
+        if (!hasDroneWithSufficientWeight
+            && hasDroneWithSufficientRange)
+        {
+            return ImpossibleReason.WeightExceeded;
+        }
+
+        if (hasDroneWithSufficientWeight
+            && !hasDroneWithSufficientRange)
+        {
+            return ImpossibleReason.RangeExceeded;
+        }
+
+        return ImpossibleReason.WeightAndRangeExceeded;
     }
 
     private static void ValidateNullItems(
