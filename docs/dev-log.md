@@ -496,3 +496,59 @@ O planejamento da suíte mostrou que testes devem validar o comportamento defini
 ### Próximo passo
 
 Iniciar a implementação do domínio, desenvolvendo cada componente acompanhado pelos testes correspondentes de maior prioridade.
+
+---
+
+## Sessão 8 — Estrutura inicial e componentes básicos do domínio
+
+### Objetivo
+
+Iniciar a implementação incremental da solução, criando a estrutura física dos projetos e implementando os componentes mais básicos e independentes do domínio.
+
+### Resultado
+
+A solution foi criada com os quatro projetos aprovados, as referências foram configuradas e os primeiros componentes do domínio foram implementados e validados por testes unitários.
+
+### Atividades realizadas
+
+- Criação da solution `DroneDeliveryCase`;
+- Criação dos projetos:
+  - `DroneDelivery.Domain`;
+  - `DroneDelivery.Api`;
+  - `DroneDelivery.Domain.Tests`;
+  - `DroneDelivery.Api.IntegrationTests`;
+- Configuração das referências entre os projetos;
+- Implementação de `Coordinate`;
+- Implementação de `DistanceCalculator`;
+- Implementação dos enums `Priority` e `ImpossibleReason`;
+- Criação e execução dos testes unitários correspondentes;
+- Validação do build completo da solution.
+
+### Decisões tomadas
+
+- `Coordinate` foi implementado como `readonly record struct`;
+- coordenadas não finitas são rejeitadas com `ArgumentOutOfRangeException`;
+- `DistanceCalculator` foi implementado como classe estática e sem estado;
+- o cálculo de distância não realiza arredondamento;
+- os enums não possuem valores neutros ou genéricos;
+- os testes dos enums verificam apenas os valores aprovados, sem depender da ordem numérica;
+- a implementação continuará de forma incremental, com uma responsabilidade por etapa.
+
+### Principais conclusões
+
+- A estrutura da solution está funcional;
+- as referências entre projetos estão corretas;
+- o domínio já possui uma base matemática e estrutural validada;
+- 17 testes do domínio estão aprovados;
+- nenhuma dependência prematura de entidades ou algoritmos foi introduzida.
+
+### Lições aprendidas
+
+- Validar a estrutura da solution antes da lógica reduz o risco de erros acumulados;
+- componentes independentes devem ser implementados primeiro;
+- testes pequenos facilitam a identificação de falhas;
+- enums não devem ser usados implicitamente como regra de ordenação.
+
+### Próximo passo
+
+Implementar a entidade `Drone` e seus testes unitários, mantendo o padrão incremental adotado.
