@@ -1425,3 +1425,58 @@ A consolidação realizada antes da API reduz o risco de misturar problemas do d
 ### Próximo passo
 
 Iniciar a implementação da API ASP.NET Core, começando pela estrutura do projeto, configuração inicial da aplicação e definição dos contratos de entrada e saída, mantendo a independência entre o domínio e a camada HTTP.
+
+---
+
+## Sessão 24 — Estrutura inicial da API ASP.NET Core
+
+### Objetivo
+
+Preparar a infraestrutura inicial da API ASP.NET Core para receber os endpoints do projeto, garantindo que a solução estivesse organizada, compilando corretamente e pronta para evoluir sem impactar a camada de domínio.
+
+### Resultado
+
+A estrutura base da API foi configurada com sucesso.
+
+O projeto passou a referenciar apenas a camada de domínio, mantendo a arquitetura definida durante o desenvolvimento. Também foram realizados os ajustes necessários para utilizar o .NET 8 em toda a solução, eliminando inconsistências entre os projetos.
+
+Ao final da etapa, a API iniciou corretamente e o Swagger foi disponibilizado para inspeção dos futuros endpoints.
+
+### Atividades realizadas
+
+- criação da estrutura inicial de pastas da API;
+- organização das pastas `Controllers` e `Contracts`;
+- configuração inicial do `Program.cs`;
+- configuração dos serviços de Controllers;
+- configuração do Swagger/OpenAPI;
+- validação da referência entre `DroneDelivery.Api` e `DroneDelivery.Domain`;
+- remoção dos arquivos de exemplo do template (quando aplicável);
+- correção do `TargetFramework` dos projetos de testes para `net8.0`;
+- recompilação completa da solução;
+- execução da API e validação do Swagger.
+
+### Decisões tomadas
+
+- manter apenas uma dependência entre a API e o domínio;
+- não introduzir novas camadas de aplicação;
+- não adicionar bibliotecas externas nesta etapa (AutoMapper, MediatR, FluentValidation, etc.);
+- manter o `Program.cs` simples, utilizando apenas os serviços necessários para inicialização da API;
+- concluir a etapa apenas após validar a execução da aplicação.
+
+### Validação
+
+- ✅ solução compilando com sucesso;
+- ✅ todos os projetos configurados para `net8.0`;
+- ✅ API iniciada corretamente;
+- ✅ Swagger disponível em `https://localhost:5027/swagger`;
+- ✅ arquitetura preservada.
+
+### Lições aprendidas
+
+Antes de implementar funcionalidades, é importante garantir que toda a infraestrutura do projeto esteja consistente. Durante esta etapa foi identificada uma incompatibilidade entre o SDK utilizado e o `TargetFramework` dos projetos de teste, demonstrando a importância de validar a configuração da solução antes de iniciar o desenvolvimento da camada HTTP.
+
+Com a infraestrutura estabilizada, as próximas etapas poderão se concentrar exclusivamente na implementação dos contratos e dos endpoints.
+
+### Próximo passo
+
+Iniciar a criação dos contratos (`Requests` e `Responses`) que serão utilizados pela API, mantendo a separação entre a camada HTTP e o domínio.
