@@ -1341,3 +1341,87 @@ A consolidação demonstrou que uma suíte pode ser considerada completa para o 
 ### Próximo passo
 
 Iniciar a implementação da API ASP.NET Core, criando sua estrutura inicial e mantendo o domínio independente dos contratos e detalhes da camada HTTP.
+
+---
+
+## Sessão 23 — Encerramento da implementação do domínio
+
+### Objetivo
+
+Formalizar o encerramento da implementação e consolidação da camada de domínio antes do início da API ASP.NET Core.
+
+### Resultado
+
+A camada de domínio foi considerada concluída.
+
+Todas as regras funcionais definidas durante a especificação foram implementadas, o algoritmo de planejamento encontra-se determinístico e a suíte de testes foi revisada quanto à organização, legibilidade, duplicidades e cobertura.
+
+O domínio está preparado para ser consumido pela API sem depender de contratos HTTP ou detalhes de infraestrutura.
+
+### Estado final do domínio
+
+- modelos de domínio implementados e imutáveis;
+- validações estruturais e invariantes protegidas;
+- cálculo de distância isolado;
+- roteamento por Vizinho Mais Próximo;
+- critérios determinísticos de desempate;
+- identificação e classificação de pedidos impossíveis;
+- seleção de drones;
+- seleção do primeiro pedido de cada viagem;
+- inserção incremental de pedidos;
+- formação de múltiplas viagens;
+- reutilização dos drones;
+- garantia de entrega única dos pedidos viáveis;
+- separação entre viagens e pedidos impossíveis;
+- refatoração estrutural do `TripPlanner`;
+- suíte consolidada com **134 testes aprovados**.
+
+### Consolidação realizada
+
+#### Bloco 1 — Refatoração interna
+
+- extração de `BuildTrips`;
+- extração de `CreateTrip`;
+- simplificação da orquestração do método `Plan`;
+- preservação integral do comportamento.
+
+#### Bloco 2 — Legibilidade
+
+- revisão da organização dos métodos;
+- revisão de nomes e variáveis;
+- manutenção das estruturas que já estavam claras;
+- rejeição de abstrações sem responsabilidade concreta.
+
+#### Bloco 3 — Suíte de testes
+
+- organização revisada;
+- nomenclatura consolidada;
+- nenhuma duplicidade real identificada;
+- nenhuma lacuna relevante de cobertura;
+- nenhuma remoção indevida;
+- nenhuma expansão artificial da suíte.
+
+### Principais conclusões
+
+- o domínio atende integralmente ao escopo funcional do projeto;
+- a arquitetura permanece simples, coesa e independente da camada HTTP;
+- o comportamento está protegido por testes automatizados;
+- as principais decisões de projeto encontram-se documentadas e validadas;
+- não existem pendências conhecidas que impeçam o início da implementação da API.
+
+### Validação
+
+- ✅ implementação do domínio concluída;
+- ✅ 134 testes automatizados aprovados;
+- ✅ build executado com sucesso;
+- ✅ comportamento preservado durante toda a consolidação.
+
+### Lições aprendidas
+
+Encerrar uma etapa de desenvolvimento exige mais do que finalizar a implementação. Foi necessário revisar a estrutura do código, confirmar a estabilidade do comportamento, avaliar criticamente a suíte de testes e evitar alterações que não agregassem valor ao projeto.
+
+A consolidação realizada antes da API reduz o risco de misturar problemas do domínio com responsabilidades da camada HTTP, permitindo que a próxima fase seja dedicada exclusivamente à exposição dos comportamentos já validados.
+
+### Próximo passo
+
+Iniciar a implementação da API ASP.NET Core, começando pela estrutura do projeto, configuração inicial da aplicação e definição dos contratos de entrada e saída, mantendo a independência entre o domínio e a camada HTTP.
