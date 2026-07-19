@@ -1265,3 +1265,79 @@ Cobertura elevada não significa necessariamente redundância. Em muitos casos, 
 ### Próximo passo
 
 Realizar a etapa final da consolidação da suíte, verificando se existe alguma regra pública do domínio ainda sem cobertura antes de iniciar a implementação da API ASP.NET Core.
+
+---
+
+## Sessão 22 — Consolidação da suíte de testes
+
+### Objetivo
+
+Concluir a revisão da suíte de testes do `TripPlanner`, verificando sua organização, nomenclatura, possíveis duplicidades e a existência de regras públicas ainda sem cobertura explícita.
+
+### Resultado
+
+A suíte de testes foi revisada integralmente e considerada adequada para o escopo do desafio.
+
+Foram realizados ajustes pontuais de nomenclatura para tornar alguns testes mais descritivos. Não foram identificadas duplicidades reais que justificassem remoções e nenhuma lacuna relevante de cobertura exigiu a criação de novos testes.
+
+A suíte permaneceu com **134 testes aprovados**.
+
+### Atividades realizadas
+
+- revisão da organização do arquivo `TripPlannerTests`;
+- análise da consistência dos nomes dos testes;
+- renomeação pontual de testes com descrições genéricas;
+- revisão de cenários potencialmente duplicados;
+- comparação entre testes específicos e testes agregados;
+- levantamento das regras públicas do `TripPlanner`;
+- verificação da cobertura de validações, impossibilidades, seleção, roteamento e múltiplas viagens;
+- análise dos critérios finais de desempate;
+- execução completa da suíte de testes;
+- validação do build da solution.
+
+### Decisões tomadas
+
+- manter a organização atual dos testes, por já acompanhar a evolução lógica do planejador;
+- preservar o padrão de nomenclatura:
+
+```text
+Method_WhenCondition_ShouldExpectedBehavior
+```
+
+- renomear apenas testes com ganho claro de legibilidade;
+- manter testes com entradas semelhantes quando protegem regras distintas;
+- preservar testes específicos e agregados, pois exercitam níveis diferentes do comportamento;
+- não remover testes apenas para reduzir o tamanho da suíte;
+- não adicionar testes artificiais para métodos privados ou cenários de desempenho;
+- não criar testes para desempates por `Id` quando o cenário dependeria de `InputOrder` duplicado, condição rejeitada pelas validações do domínio.
+
+### Principais conclusões
+
+- a suíte está organizada e utiliza nomes descritivos;
+- nenhuma duplicidade real foi encontrada;
+- a sobreposição existente é deliberada e saudável;
+- todas as regras públicas alcançáveis do `TripPlanner` estão protegidas;
+- os testes permanecem focados no comportamento público, sem acoplamento aos métodos privados;
+- não foi necessário aumentar artificialmente o número de testes;
+- a consolidação da suíte foi concluída com **134 testes aprovados**.
+
+### Validação
+
+- ✅ 134 testes aprovados;
+- ✅ nenhuma falha;
+- ✅ build executado com sucesso;
+- ✅ nenhum teste removido;
+- ✅ nenhum novo teste artificial adicionado;
+- ✅ comportamento do domínio preservado.
+
+### Lições aprendidas
+
+Uma suíte de testes não deve ser avaliada apenas pela quantidade de casos existentes. É necessário verificar se cada teste protege uma regra relevante, se cenários semelhantes exercitam comportamentos distintos e se as regras públicas alcançáveis estão cobertas.
+
+Também foi possível observar que nem todo critério documentado produz necessariamente um cenário válido e alcançável. Quando uma validação anterior impede que determinado desempate seja utilizado, criar um teste artificial para alcançá-lo introduziria uma contradição em vez de melhorar a cobertura.
+
+A consolidação demonstrou que uma suíte pode ser considerada completa para o escopo do projeto sem buscar cobertura indiscriminada ou adicionar casos que não representam entradas válidas do domínio.
+
+### Próximo passo
+
+Iniciar a implementação da API ASP.NET Core, criando sua estrutura inicial e mantendo o domínio independente dos contratos e detalhes da camada HTTP.
