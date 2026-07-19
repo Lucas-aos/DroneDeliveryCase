@@ -1105,3 +1105,55 @@ Separar a construção de uma viagem da coordenação do planejamento simplifico
 ### Próximo passo
 
 Realizar os refinamentos finais do algoritmo, revisar casos de borda, ampliar a cobertura de testes quando necessário e iniciar a implementação da API para exposição do planejamento de viagens.
+
+---
+
+## Sessão 20 — Consolidação do TripPlanner (Bloco 1 e Bloco 2)
+
+### Objetivo
+
+Realizar a primeira etapa de consolidação do domínio, reduzindo a complexidade interna do `TripPlanner` e aprimorando sua organização, sem alterar qualquer regra de negócio ou comportamento já validado pelos testes.
+
+### Resultado
+
+O `TripPlanner` foi reorganizado por meio de refatorações estruturais, mantendo exatamente o mesmo comportamento funcional. A lógica de orquestração do planejamento foi extraída para métodos privados com responsabilidades bem definidas, tornando o fluxo principal mais simples e legível.
+
+Também foi realizada uma revisão de organização da classe, padronizando a ordem lógica dos métodos e pequenas melhorias de consistência, sem introduzir novas abstrações ou aumentar a complexidade do projeto.
+
+A suíte permaneceu com **134 testes aprovados**, confirmando que todas as alterações foram exclusivamente estruturais.
+
+### Atividades realizadas
+
+- Extração da lógica de formação de viagens para o método `BuildTrips`;
+- extração da criação de uma viagem para o método `CreateTrip`;
+- simplificação do método `Plan`, mantendo apenas a orquestração de alto nível;
+- reorganização dos métodos privados conforme o fluxo natural de execução;
+- revisão da nomenclatura das variáveis relacionadas às rotas e coleções;
+- pequenos ajustes de legibilidade em `BuildTrip`;
+- revisão geral da organização do `TripPlanner`;
+- execução completa da suíte de testes;
+- validação do build da solution.
+
+### Decisões tomadas
+
+- A refatoração não alterou nenhuma regra de negócio;
+- nenhuma nova abstração (Factory, Strategy, Builder ou Application Layer) foi introduzida;
+- métodos auxiliares só foram extraídos quando representavam conceitos claros do domínio;
+- pequenas extrações sem ganho real de legibilidade foram descartadas;
+- o foco permaneceu na clareza do código e na facilidade de manutenção.
+
+### Principais conclusões
+
+- O método `Plan` passou a representar apenas o fluxo de alto nível do planejamento;
+- as responsabilidades ficaram melhor distribuídas entre métodos privados;
+- a leitura da classe tornou-se mais próxima da sequência lógica do algoritmo;
+- a consolidação preservou integralmente o comportamento validado pela suíte de testes;
+- a arquitetura do domínio encontra-se preparada para a implementação da API.
+
+### Lições aprendidas
+
+Refatorar não significa criar novas abstrações ou reduzir o número de linhas de código. Nesta etapa, o principal objetivo foi melhorar a organização interna da classe, tornando cada método responsável por um único conceito do domínio. A validação por meio dos **134 testes automatizados** confirmou que a melhoria ocorreu apenas na estrutura do código, sem impacto funcional.
+
+### Próximo passo
+
+Revisar a suíte de testes em busca de redundâncias, inconsistências de nomenclatura e oportunidades de organização antes de iniciar a implementação da API ASP.NET Core.
