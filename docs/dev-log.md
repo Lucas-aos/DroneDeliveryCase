@@ -1572,3 +1572,81 @@ A ordem dos drones e pedidos nos arrays já fornece informação suficiente para
 ### Próximo passo
 
 Definir o padrão de implementação dos DTOs em C#, comparando `class`, `record`, propriedades `init` e construtores posicionais antes de criar os arquivos dos contratos.
+
+---
+
+# Sessão 26 — Implementação dos contratos da API
+
+## Objetivo
+
+Implementar os contratos públicos da API definidos na etapa anterior, estabelecendo uma interface HTTP desacoplada da camada de domínio.
+
+---
+
+## Resultado
+
+Todos os DTOs de Request e Response foram implementados seguindo o padrão arquitetural aprovado, mantendo a separação entre a camada HTTP e o domínio.
+
+A solução foi recompilada com sucesso após a implementação, confirmando a consistência da estrutura criada.
+
+---
+
+## Contratos implementados
+
+### Requests
+
+- `PlanningRequest`
+- `DroneRequest`
+- `OrderRequest`
+
+### Responses
+
+- `PlanningResponse`
+- `TripResponse`
+- `TripOrderResponse`
+- `ImpossibleOrderResponse`
+- `ErrorResponse`
+
+---
+
+## Padrão adotado
+
+Todos os contratos seguem a mesma convenção:
+
+- `sealed record`;
+- propriedades nomeadas;
+- propriedades `init`;
+- inicialização de referências com `string.Empty`;
+- inicialização de coleções com `[]`;
+- ausência de regras de negócio;
+- ausência de validações;
+- ausência de atributos de serialização.
+
+Essa padronização proporciona consistência visual, imutabilidade após a desserialização e facilita futuras evoluções da camada HTTP.
+
+---
+
+## Decisões arquiteturais consolidadas
+
+Durante esta etapa foram consolidadas as seguintes decisões:
+
+- os contratos da API permanecem independentes das entidades do domínio;
+- `Priority` será representada como texto no contrato HTTP;
+- `Reason` será representada como texto nas respostas da API;
+- `Sequence` será retornada explicitamente para indicar a ordem das entregas em cada viagem;
+- `InputOrder` não faz parte do contrato público e será inferido pela posição dos elementos durante o mapeamento para o domínio.
+
+---
+
+## Validação
+
+- ✅ oito DTOs implementados;
+- ✅ estrutura de pastas organizada;
+- ✅ padrão único aplicado a todos os contratos;
+- ✅ solução compilando sem erros.
+
+---
+
+## Próximo passo
+
+Implementar o primeiro endpoint da API (`PlanningController`), realizando o mapeamento entre os contratos HTTP e os objetos do domínio, preservando todas as regras de negócio já implementadas e testadas.
