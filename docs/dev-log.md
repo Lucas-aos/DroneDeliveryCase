@@ -1211,3 +1211,57 @@ Uma boa suíte de testes não depende apenas da cobertura, mas também da clarez
 ### Próximo passo
 
 Revisar a suíte em busca de possíveis duplicidades ou sobreposição de cenários, verificando se cada teste existente valida um comportamento distinto antes de iniciar a implementação da API.
+
+---
+
+## Sessão 22 — Consolidação da suíte de testes (Duplicidades)
+
+### Objetivo
+
+Revisar a suíte de testes do `TripPlanner` para identificar possíveis duplicidades, verificando se diferentes testes exerciam exatamente o mesmo comportamento e se havia oportunidades de simplificar a cobertura sem perda de proteção contra regressões.
+
+### Resultado
+
+Foi realizada uma revisão completa dos cenários cobertos pela suíte de testes. Embora alguns testes apresentem entradas semelhantes, todos exercitam regras de negócio distintas ou validam comportamentos complementares do algoritmo.
+
+Nenhuma duplicidade real foi identificada e, consequentemente, nenhum teste precisou ser removido.
+
+### Atividades realizadas
+
+- revisão comparativa dos cenários de testes;
+- análise das regras de negócio exercitadas por cada caso;
+- verificação de sobreposição entre testes unitários e cenários agregados;
+- avaliação da necessidade de remoção de testes redundantes;
+- execução completa da suíte de testes;
+- validação do build da solution.
+
+### Decisões tomadas
+
+- manter testes que utilizam entradas semelhantes, mas validam comportamentos diferentes;
+- preservar testes específicos que isolam regras individuais do domínio;
+- manter testes agregados responsáveis por validar a integração entre diferentes regras do algoritmo;
+- não remover testes apenas por apresentarem cenários parecidos.
+
+### Principais conclusões
+
+- não foram encontradas duplicidades reais na suíte;
+- a sobreposição existente é intencional e contribui para uma identificação mais precisa de regressões;
+- os testes específicos e agregados se complementam, oferecendo uma cobertura mais robusta do comportamento do domínio;
+- a organização atual da suíte permanece adequada para a manutenção do projeto.
+
+### Validação
+
+Após a revisão:
+
+- ✅ nenhuma remoção de testes foi necessária;
+- ✅ 134 testes aprovados;
+- ✅ build executado com sucesso;
+- ✅ nenhuma alteração de comportamento.
+
+### Lições aprendidas
+
+Cobertura elevada não significa necessariamente redundância. Em muitos casos, cenários semelhantes validam regras diferentes do domínio e facilitam a identificação da causa de uma regressão. Antes de remover testes, é importante verificar se eles realmente exercitam o mesmo comportamento ou apenas compartilham parte dos dados de entrada.
+
+### Próximo passo
+
+Realizar a etapa final da consolidação da suíte, verificando se existe alguma regra pública do domínio ainda sem cobertura antes de iniciar a implementação da API ASP.NET Core.
