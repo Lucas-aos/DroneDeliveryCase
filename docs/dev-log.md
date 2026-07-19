@@ -603,3 +603,250 @@ Implementar entidades imutáveis com validações concentradas no construtor sim
 ### Próximo passo
 
 Implementar a entidade `Order`, reutilizando os componentes já desenvolvidos (`Coordinate` e `Priority`) e mantendo o mesmo padrão de validação, imutabilidade e cobertura por testes unitários.
+
+---
+
+## Sessão 10 — Implementação da entidade `Order`
+
+### Objetivo
+
+Implementar a entidade responsável por representar um pedido individual do sistema, garantindo sua imutabilidade e impedindo a criação de pedidos com dados inválidos.
+
+### Resultado
+
+A entidade `Order` foi implementada com propriedades somente para leitura e validações realizadas no construtor. A implementação reutiliza os componentes `Coordinate` e `Priority`, mantendo as responsabilidades já definidas no modelo de domínio.
+
+Todos os testes unitários da entidade foram executados com sucesso, e a suíte do domínio passou a conter **44 testes aprovados**.
+
+### Atividades realizadas
+
+- Criação da entidade `Order`;
+- implementação das propriedades `Id`, `WeightKg`, `Destination`, `Priority` e `InputOrder`;
+- reutilização do value object `Coordinate` para representar o destino;
+- reutilização do enum `Priority`;
+- implementação das validações do construtor;
+- validação do identificador obrigatório;
+- validação do peso como um valor positivo e finito;
+- validação da prioridade recebida;
+- validação da ordem de entrada;
+- criação dos testes unitários da entidade;
+- execução isolada dos testes de `Order`;
+- execução completa dos testes do domínio;
+- validação do build da solution.
+
+### Decisões tomadas
+
+- `Order` foi implementada como uma `class` imutável;
+- todas as propriedades são somente para leitura;
+- o destino é representado por `Coordinate`, evitando manter coordenadas separadas na entidade;
+- as validações já garantidas por `Coordinate` não são repetidas em `Order`;
+- o valor padrão de `Coordinate`, correspondente à posição `(0, 0)`, é aceito como destino válido;
+- o identificador não pode ser nulo, vazio ou composto apenas por espaços;
+- o peso deve ser um número finito maior que zero;
+- a prioridade deve corresponder a um valor definido no enum `Priority`;
+- `InputOrder` deve ser maior ou igual a zero;
+- foram utilizadas exceções padrão do .NET;
+- nenhuma regra de comparação, ordenação ou seleção de pedidos foi adicionada à entidade.
+
+### Principais conclusões
+
+- A entidade `Order` foi implementada conforme o modelo de domínio aprovado;
+- suas invariantes são protegidas durante a construção;
+- o uso de `Coordinate` tornou o modelo mais expressivo e evitou duplicação de conceitos;
+- a validação explícita de `Priority` protege o domínio contra conversões inválidas de valores numéricos;
+- a suíte de testes passou de **32 para 44 testes aprovados**;
+- a solution continuou compilando sem erros.
+
+### Lições aprendidas
+
+A reutilização de value objects e enums já validados reduz duplicação de regras e deixa as entidades mais simples. Cada componente deve validar apenas as invariantes que pertencem à sua própria responsabilidade.
+
+Também foi reforçada a importância de proteger o domínio contra valores que podem ser aceitos pelo compilador, mas que não representam estados válidos, como a conversão direta de um número não definido para um enum.
+
+### Próximo passo
+
+Implementar a entidade `Trip`, utilizando uma coleção somente para leitura de pedidos, realizando uma cópia defensiva da coleção recebida e mantendo as regras de capacidade, alcance e planejamento fora da entidade.
+
+---
+
+## Sessão 11 — Implementação da entidade `Trip`
+
+### Objetivo
+
+Implementar a entidade responsável por representar uma viagem, preservando a imutabilidade da coleção de pedidos e garantindo apenas as invariantes estruturais do objeto.
+
+### Resultado
+
+A entidade `Trip` foi implementada utilizando uma coleção somente para leitura, protegida por cópia defensiva. A entidade valida apenas sua consistência estrutural, mantendo as regras de capacidade, alcance e planejamento sob responsabilidade do `TripPlanner`.
+
+A suíte do domínio passou a conter **61 testes aprovados**.
+
+### Atividades realizadas
+
+- Implementação da entidade `Trip`;
+- criação da coleção somente leitura de pedidos;
+- implementação da cópia defensiva da coleção recebida;
+- validação dos argumentos do construtor;
+- implementação dos testes unitários;
+- execução completa da suíte;
+- validação do build.
+
+### Decisões tomadas
+
+- `Trip` foi implementada como classe imutável;
+- pedidos são expostos como `IReadOnlyList<Order>`;
+- a coleção recebida é copiada antes de ser armazenada;
+- coleções vazias não são permitidas;
+- a entidade não valida capacidade, alcance ou consistência do planejamento.
+
+### Principais conclusões
+
+- O domínio passou a representar viagens completas;
+- a responsabilidade entre entidade e algoritmo permaneceu bem definida;
+- a suíte atingiu **61 testes aprovados**.
+
+### Lições aprendidas
+
+Coleções imutáveis reduzem o acoplamento e evitam alterações externas em objetos que representam resultados do domínio.
+
+### Próximo passo
+
+Implementar a entidade `ImpossibleOrder`.
+
+---
+
+## Sessão 12 — Implementação da entidade `ImpossibleOrder`
+
+### Objetivo
+
+Representar pedidos que não podem ser atendidos juntamente com o motivo da impossibilidade.
+
+### Resultado
+
+Foi implementada a entidade `ImpossibleOrder`, contendo o pedido e seu motivo de impossibilidade. A implementação mantém o padrão de imutabilidade utilizado pelas demais entidades do domínio.
+
+A suíte passou a conter **67 testes aprovados**.
+
+### Atividades realizadas
+
+- Implementação da entidade;
+- validação do pedido recebido;
+- validação do enum `ImpossibleReason`;
+- criação dos testes unitários;
+- execução da suíte completa.
+
+### Decisões tomadas
+
+- A entidade apenas representa um resultado;
+- não verifica se o motivo informado está correto;
+- a validação da lógica permanece responsabilidade do `TripPlanner`.
+
+### Principais conclusões
+
+- Todos os conceitos básicos do domínio passaram a estar representados;
+- a suíte atingiu **67 testes aprovados**.
+
+### Lições aprendidas
+
+Nem toda entidade deve conter regras de negócio complexas. Algumas existem apenas para representar estados válidos do domínio.
+
+### Próximo passo
+
+Implementar o agregado `PlanningResult`.
+
+---
+
+## Sessão 13 — Implementação do agregado `PlanningResult`
+
+### Objetivo
+
+Implementar o agregado responsável por representar o resultado completo do planejamento das viagens.
+
+### Resultado
+
+Foi implementado o agregado `PlanningResult`, contendo as viagens planejadas e os pedidos impossíveis.
+
+As coleções são expostas somente para leitura, protegidas por cópia defensiva e validadas estruturalmente.
+
+A suíte passou a conter **79 testes aprovados**.
+
+### Atividades realizadas
+
+- Implementação do agregado;
+- implementação das coleções somente leitura;
+- cópia defensiva das coleções;
+- validação dos argumentos;
+- implementação dos testes unitários;
+- execução completa da suíte.
+
+### Decisões tomadas
+
+- O agregado não valida regras do algoritmo;
+- coleções vazias são permitidas;
+- apenas integridade estrutural é verificada.
+
+### Principais conclusões
+
+- Todo o modelo de domínio passou a estar implementado;
+- a suíte atingiu **79 testes aprovados**.
+
+### Lições aprendidas
+
+Agregados não precisam repetir regras cuja responsabilidade pertence ao componente que os produz.
+
+### Próximo passo
+
+Implementar o algoritmo de roteamento utilizando a heurística do Vizinho Mais Próximo.
+
+---
+
+## Sessão 14 — Implementação do algoritmo de roteamento
+
+### Objetivo
+
+Implementar o cálculo da rota utilizando a heurística do Vizinho Mais Próximo e retornar a sequência ordenada de pedidos juntamente com a distância total da viagem.
+
+### Resultado
+
+Foram implementados `RouteCalculationResult` e `NearestNeighborRouteCalculator`.
+
+O algoritmo inicia a rota na base `(0,0)`, seleciona iterativamente o pedido mais próximo da posição atual e inclui explicitamente o retorno à base no cálculo da distância total.
+
+Todos os critérios determinísticos de desempate definidos na especificação funcional foram implementados e validados.
+
+A suíte completa do domínio passou a conter **100 testes aprovados**.
+
+### Atividades realizadas
+
+- Criação da pasta `Planning`;
+- implementação de `RouteCalculationResult`;
+- implementação de `NearestNeighborRouteCalculator`;
+- utilização de `DistanceCalculator`;
+- implementação da heurística do Vizinho Mais Próximo;
+- implementação dos critérios determinísticos de desempate;
+- implementação dos testes unitários;
+- execução da suíte completa;
+- validação do build.
+
+### Decisões tomadas
+
+- O algoritmo possui responsabilidade exclusivamente geométrica;
+- drones, capacidade, alcance e pedidos impossíveis permanecem fora deste componente;
+- a distância total inclui o retorno à base;
+- a ordem de enumeração da coleção nunca é utilizada como critério de desempate;
+- a prioridade é comparada explicitamente, sem depender do valor numérico do enum.
+
+### Principais conclusões
+
+- O roteamento tornou-se totalmente determinístico;
+- todos os critérios definidos na especificação funcional foram implementados;
+- o domínio passou a conter todos os componentes necessários para iniciar o planejamento das viagens;
+- a suíte atingiu **100 testes aprovados**.
+
+### Lições aprendidas
+
+Separar o cálculo da rota do planejamento das viagens simplifica o domínio, aumenta a reutilização do algoritmo e torna os testes significativamente mais objetivos.
+
+### Próximo passo
+
+Iniciar a implementação incremental do `TripPlanner`, responsável por orquestrar todo o algoritmo de planejamento das viagens.
