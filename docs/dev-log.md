@@ -1650,3 +1650,97 @@ Durante esta etapa foram consolidadas as seguintes decisões:
 ## Próximo passo
 
 Implementar o primeiro endpoint da API (`PlanningController`), realizando o mapeamento entre os contratos HTTP e os objetos do domínio, preservando todas as regras de negócio já implementadas e testadas.
+
+---
+
+# Sessão 27 — Estrutura inicial do PlanningController
+
+## Objetivo
+
+Criar o primeiro endpoint da API, estabelecendo a rota de planejamento e conectando os contratos públicos de entrada e saída à camada HTTP.
+
+Nesta etapa, o endpoint ainda não executa regras de negócio nem interage com o domínio.
+
+---
+
+## Implementação realizada
+
+Foi criado o arquivo:
+
+```text
+src/DroneDelivery.Api/Controllers/PlanningController.cs
+```
+
+O controller expõe o endpoint:
+
+```http
+POST /api/planning
+```
+
+A operação recebe um `PlanningRequest` e retorna temporariamente um `PlanningResponse` vazio.
+
+---
+
+## Estrutura do endpoint
+
+O controller utiliza:
+
+- `[ApiController]`;
+- `[Route("api/planning")]`;
+- `[HttpPost]`;
+- `ActionResult<PlanningResponse>`;
+- `[ProducesResponseType]` para documentar a resposta de sucesso.
+
+O ASP.NET Core infere automaticamente que o `PlanningRequest` deve ser desserializado a partir do corpo da requisição, sem necessidade de adicionar `[FromBody]`.
+
+---
+
+## Resposta temporária
+
+Até que o mapeamento e a integração com o domínio sejam implementados, o endpoint retorna:
+
+```json
+{
+  "trips": [],
+  "impossibleOrders": []
+}
+```
+
+Essa resposta temporária permite validar a infraestrutura HTTP sem antecipar responsabilidades da próxima etapa.
+
+---
+
+## Decisões arquiteturais
+
+- manter o controller restrito à camada HTTP;
+- não realizar ainda o mapeamento de DTOs para entidades de domínio;
+- não instanciar ou chamar o `TripPlanner`;
+- não implementar conversão de prioridades;
+- não tratar exceções nesta etapa;
+- não criar testes de integração ainda;
+- utilizar `POST`, pois o planejamento depende de uma estrutura complexa enviada no corpo da requisição.
+
+---
+
+## Validação
+
+- ✅ `PlanningController` criado;
+- ✅ solução compilando sem erros;
+- ✅ API iniciada corretamente;
+- ✅ endpoint `POST /api/planning` visível no Swagger;
+- ✅ requisição processada com status `200`;
+- ✅ resposta temporária retornada com coleções vazias.
+
+---
+
+## Próximo passo
+
+Implementar o mapeamento entre os contratos HTTP e os objetos do domínio, incluindo:
+
+- criação dos drones;
+- criação dos pedidos;
+- geração de `InputOrder` pela posição nos arrays;
+- conversão textual de `Priority`;
+- criação de `Coordinate`;
+- chamada ao `TripPlanner`;
+- conversão do resultado de domínio para `PlanningResponse`.
