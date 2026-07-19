@@ -65,36 +65,38 @@ public class TripPlanner
                 impossibleOrders);
         }
 
-        var firstOrder = SelectFirstOrder(feasibleOrders);
+        var remainingOrders = feasibleOrders.ToList();
+        var trips = new List<Trip>();
 
-        var initialRoute = RouteCalculator.Calculate(
-            new[] { firstOrder });
-
-        var selectedDrone = SelectDrone(
-            droneList,
-            firstOrder.WeightKg,
-            initialRoute.TotalDistanceKm);
-
-        var firstTrip = BuildFirstTrip(
-            selectedDrone,
-            firstOrder,
-            feasibleOrders);
-
-        var plannedOrderIds = firstTrip.Orders
-            .Select(order => order.Id)
-            .ToHashSet(StringComparer.Ordinal);
-
-        var hasRemainingFeasibleOrders = feasibleOrders.Any(
-            order => !plannedOrderIds.Contains(order.Id));
-
-        if (hasRemainingFeasibleOrders)
+        while (remainingOrders.Count > 0)
         {
-            throw new NotSupportedException(
-                "Formation of additional trips has not been implemented yet.");
+            var firstOrder = SelectFirstOrder(remainingOrders);
+
+            var initialRoute = RouteCalculator.Calculate(
+                new[] { firstOrder });
+
+            var selectedDrone = SelectDrone(
+                droneList,
+                firstOrder.WeightKg,
+                initialRoute.TotalDistanceKm);
+
+            var trip = BuildTrip(
+                selectedDrone,
+                firstOrder,
+                remainingOrders);
+
+            trips.Add(trip);
+
+            var plannedOrderIds = trip.Orders
+                .Select(order => order.Id)
+                .ToHashSet(StringComparer.Ordinal);
+
+            remainingOrders.RemoveAll(order =>
+                plannedOrderIds.Contains(order.Id));
         }
 
         return new PlanningResult(
-            new[] { firstTrip },
+            trips,
             impossibleOrders);
     }
 
@@ -125,7 +127,7 @@ public class TripPlanner
                 "Unsupported priority.")
         };
     }
-    private static Trip BuildFirstTrip(
+    private static Trip BuildTrip(
     Drone drone,
     Order firstOrder,
     IReadOnlyCollection<Order> feasibleOrders)

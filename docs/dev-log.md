@@ -1051,3 +1051,57 @@ A implementação incremental permitiu expandir o algoritmo sem introduzir códi
 ### Próximo passo
 
 Implementar o laço externo do planejamento para formar todas as viagens necessárias até consumir todos os pedidos viáveis, reutilizando a lógica de formação da primeira viagem desenvolvida nesta etapa.
+
+---
+
+## Sessão 19 — Planejamento de múltiplas viagens
+
+### Objetivo
+
+Expandir o `TripPlanner` para planejar todas as viagens necessárias até atender todos os pedidos viáveis, reutilizando a lógica de formação de viagem implementada anteriormente.
+
+### Resultado
+
+Foi implementado o laço externo de planejamento, permitindo que o algoritmo forme sucessivas viagens até consumir todos os pedidos viáveis. A lógica de construção de uma viagem foi reutilizada integralmente, passando apenas a operar sobre o conjunto de pedidos ainda não planejados.
+
+O `NotSupportedException` anteriormente utilizado quando restavam pedidos viáveis deixou de existir, sendo substituído pela criação automática de novas viagens.
+
+A suíte completa passou a conter **134 testes aprovados**.
+
+### Atividades realizadas
+
+- Implementação do laço externo do planejamento;
+- reutilização da lógica de formação de viagens;
+- remoção dos pedidos planejados ao final de cada iteração;
+- reutilização dos drones entre viagens;
+- remoção do `NotSupportedException` para pedidos viáveis remanescentes;
+- atualização dos testes que anteriormente esperavam exceção;
+- criação de testes para múltiplas viagens;
+- validação da reutilização do mesmo drone;
+- validação de que cada pedido viável é entregue exatamente uma vez;
+- execução completa da suíte de testes;
+- validação do build da solution.
+
+### Decisões tomadas
+
+- A lógica de formação de viagens permaneceu concentrada em `BuildTrip`;
+- o laço externo apenas coordena a criação sucessiva das viagens;
+- o mesmo drone pode ser reutilizado em viagens diferentes;
+- pedidos impossíveis continuam sendo retornados separadamente no `PlanningResult`;
+- cada iteração remove do conjunto de trabalho todos os pedidos já planejados, garantindo progresso do algoritmo.
+
+### Principais conclusões
+
+- O `TripPlanner` passou a implementar o fluxo completo de planejamento do MVP;
+- todas as viagens necessárias são geradas automaticamente;
+- cada pedido viável é planejado exatamente uma vez;
+- o algoritmo permaneceu incremental e reutilizou integralmente os componentes desenvolvidos nas etapas anteriores;
+- a suíte atingiu **134 testes aprovados**.
+
+### Lições aprendidas
+
+Separar a construção de uma viagem da coordenação do planejamento simplificou significativamente a evolução do algoritmo. A reutilização dos componentes implementados anteriormente permitiu adicionar suporte a múltiplas viagens sem duplicação de lógica, mantendo o código mais simples, previsível e fácil de testar.
+
+### Próximo passo
+
+Realizar os refinamentos finais do algoritmo, revisar casos de borda, ampliar a cobertura de testes quando necessário e iniciar a implementação da API para exposição do planejamento de viagens.
