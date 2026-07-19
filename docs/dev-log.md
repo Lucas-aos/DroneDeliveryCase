@@ -1157,3 +1157,57 @@ Refatorar não significa criar novas abstrações ou reduzir o número de linhas
 ### Próximo passo
 
 Revisar a suíte de testes em busca de redundâncias, inconsistências de nomenclatura e oportunidades de organização antes de iniciar a implementação da API ASP.NET Core.
+
+---
+
+## Sessão 21 — Consolidação da suíte de testes (Nomenclatura)
+
+### Objetivo
+
+Revisar a nomenclatura dos testes do `TripPlanner` para garantir que cada caso de teste descrevesse claramente o cenário exercitado e o comportamento esperado, mantendo consistência em toda a suíte.
+
+### Resultado
+
+Foi realizada uma revisão completa da nomenclatura dos testes do `TripPlanner`. A análise mostrou que a suíte já seguia, em sua maior parte, o padrão:
+
+```text
+Method_WhenCondition_ShouldExpectedBehavior
+```
+
+Foram realizadas apenas renomeações pontuais em testes cuja descrição poderia ser mais objetiva, sem alterar qualquer comportamento, asserção ou cobertura da suíte.
+
+### Atividades realizadas
+
+- revisão completa da nomenclatura dos testes;
+- identificação de nomes excessivamente genéricos;
+- substituição de descrições pouco específicas por nomes mais explícitos;
+- preservação dos testes cuja nomenclatura já representava corretamente o comportamento esperado;
+- execução completa da suíte de testes;
+- validação do build da solution.
+
+### Decisões tomadas
+
+- renomear apenas testes com ganho claro de legibilidade;
+- evitar alterações puramente estéticas;
+- manter o padrão `Method_WhenCondition_ShouldExpectedBehavior` como referência para novos testes.
+
+### Principais conclusões
+
+- a suíte já apresentava alto nível de consistência;
+- apenas poucos nomes precisaram de ajustes;
+- os testes continuam funcionando como documentação executável do comportamento do domínio;
+- nenhuma alteração funcional foi necessária.
+
+### Validação
+
+- ✅ 134 testes aprovados;
+- ✅ build executado com sucesso;
+- ✅ nenhuma alteração de comportamento.
+
+### Lições aprendidas
+
+Uma boa suíte de testes não depende apenas da cobertura, mas também da clareza dos seus nomes. Um teste bem nomeado comunica o cenário validado antes mesmo da leitura da implementação, tornando a suíte uma documentação viva do domínio.
+
+### Próximo passo
+
+Revisar a suíte em busca de possíveis duplicidades ou sobreposição de cenários, verificando se cada teste existente valida um comportamento distinto antes de iniciar a implementação da API.

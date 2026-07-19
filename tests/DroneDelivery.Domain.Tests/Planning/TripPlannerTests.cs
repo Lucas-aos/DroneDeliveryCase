@@ -426,7 +426,7 @@ public class TripPlannerTests
                     == ImpossibleReason.RangeExceeded);
     }
     [Fact]
-    public void Plan_WhenThereIsOneFeasibleOrder_ShouldCreateSingleOrderTrip()
+    public void Plan_WhenSingleOrderIsFeasible_ShouldCreateSingleOrderTrip()
     {
         var drone = CreateDrone(
             capacityKg: 10,
@@ -453,7 +453,7 @@ public class TripPlannerTests
         Assert.Equal(10, trip.TotalDistanceKm, 10);
     }
     [Fact]
-    public void Plan_WhenThereIsOneFeasibleOrderAndOneImpossibleOrder_ShouldReturnBoth()
+    public void Plan_WhenOneOrderIsFeasibleAndAnotherIsImpossible_ShouldReturnTripAndImpossibleOrder()
     {
         var drone = CreateDrone(
             capacityKg: 10,
@@ -680,7 +680,7 @@ public class TripPlannerTests
         Assert.Equal(12, trip.TotalDistanceKm, 10);
     }
     [Fact]
-    public void Plan_WhenFeasibleOrdersFitOneTripAndThereIsAnImpossibleOrder_ShouldReturnBoth()
+    public void Plan_WhenFeasibleOrdersFitOneTripAndAnotherOrderIsImpossible_ShouldReturnTripAndImpossibleOrder()
     {
         var drone = CreateDrone(
             capacityKg: 20,
@@ -976,7 +976,7 @@ public class TripPlannerTests
         Assert.Equal(20, result.Trips[1].TotalDistanceKm, 10);
     }
     [Fact]
-    public void Plan_WhenCreatingMultipleTrips_ShouldDeliverEveryFeasibleOrderExactlyOnce()
+    public void Plan_WhenMultipleTripsAreCreated_ShouldDeliverEveryFeasibleOrderExactlyOnce()
     {
         var drone = CreateDrone(
             capacityKg: 10,
