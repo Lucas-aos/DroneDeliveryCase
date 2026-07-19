@@ -850,3 +850,55 @@ Separar o cálculo da rota do planejamento das viagens simplifica o domínio, au
 ### Próximo passo
 
 Iniciar a implementação incremental do `TripPlanner`, responsável por orquestrar todo o algoritmo de planejamento das viagens.
+
+---
+
+## Sessão 15 — Implementação inicial do `TripPlanner`
+
+### Objetivo
+
+Iniciar a implementação incremental do `TripPlanner`, estabelecendo a base do algoritmo de planejamento por meio das validações estruturais e dos primeiros comportamentos definidos na especificação funcional.
+
+### Resultado
+
+Foi implementada a primeira versão funcional do `TripPlanner`, responsável por validar os parâmetros de entrada, garantir a consistência das coleções recebidas e tratar os cenários-base do planejamento.
+
+Nesta etapa ainda não foi implementada a lógica de formação de viagens ou seleção de pedidos, mantendo o escopo restrito às responsabilidades aprovadas para a primeira fase do algoritmo.
+
+A suíte completa do domínio passou a conter **112 testes aprovados**.
+
+### Atividades realizadas
+
+- Criação da estrutura inicial do `TripPlanner`;
+- implementação das validações de parâmetros nulos;
+- implementação das validações de itens nulos nas coleções;
+- implementação da validação de identificadores duplicados;
+- implementação da validação de `InputOrder` duplicado;
+- implementação do comportamento para coleções de pedidos vazias;
+- implementação do comportamento para ausência de drones quando existem pedidos;
+- criação dos testes unitários correspondentes;
+- execução completa da suíte de testes;
+- validação do build da solution.
+
+### Decisões tomadas
+
+- As coleções recebidas são materializadas no início da execução para evitar múltiplas enumerações;
+- ausência de drones com pedidos existentes é tratada como entrada inválida, resultando em `ArgumentException`;
+- pedidos impossíveis ainda não são identificados nesta etapa;
+- nenhuma lógica de roteamento ou formação de viagens foi introduzida;
+- o algoritmo permanece incremental, adicionando novas responsabilidades apenas nas próximas etapas.
+
+### Principais conclusões
+
+- O `TripPlanner` passou a possuir comportamento executável;
+- todas as validações estruturais previstas para a primeira etapa foram implementadas;
+- o domínio permaneceu consistente com a especificação funcional aprovada;
+- a suíte atingiu **112 testes aprovados**.
+
+### Lições aprendidas
+
+Implementar primeiro as validações estruturais reduz a complexidade das etapas seguintes e estabelece uma base confiável para evolução do algoritmo. Cada incremento adiciona apenas uma responsabilidade nova, mantendo o comportamento sempre consistente e totalmente testado.
+
+### Próximo passo
+
+Implementar a identificação de pedidos impossíveis e iniciar a primeira versão da formação de viagens utilizando os componentes de planejamento já desenvolvidos.
