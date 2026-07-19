@@ -953,3 +953,50 @@ Separar a identificação de pedidos impossíveis da lógica de formação das v
 ### Próximo passo
 
 Implementar a primeira formação de viagens para os pedidos viáveis, iniciando pela seleção do drone e do primeiro pedido da rota.
+
+---
+
+## Sessão 17 — Formação da primeira viagem
+
+### Objetivo
+
+Implementar o primeiro cenário completo de planejamento de entregas, permitindo que o `TripPlanner` forme uma viagem quando existir exatamente um pedido viável após a identificação dos pedidos impossíveis.
+
+### Resultado
+
+Foi implementada a primeira formação de viagem do algoritmo. Quando existe exatamente um pedido viável, o `TripPlanner` seleciona o drone conforme os critérios definidos pela especificação, cria uma viagem contendo esse único pedido, utiliza o `NearestNeighborRouteCalculator` para calcular a rota e retorna um `PlanningResult` completo juntamente com os pedidos classificados como impossíveis.
+
+Quando houver mais de um pedido viável, o método continua lançando `NotSupportedException`, preservando a implementação incremental do algoritmo.
+
+A suíte completa passou a conter **125 testes aprovados**.
+
+### Atividades realizadas
+
+- Implementação da seleção do drone segundo os critérios da especificação;
+- implementação da formação de uma viagem unitária;
+- integração da viagem com o `NearestNeighborRouteCalculator`;
+- retorno conjunto de viagens planejadas e pedidos impossíveis;
+- atualização dos testes que anteriormente esperavam `NotSupportedException` para o cenário de um único pedido viável;
+- criação de novos testes para validar a formação da viagem e a seleção do drone;
+- execução completa da suíte de testes e validação do build.
+
+### Decisões tomadas
+
+- A viagem unitária reutiliza integralmente o `NearestNeighborRouteCalculator`, evitando duplicação da lógica de cálculo de rota.
+- A seleção do drone permanece um detalhe interno do `TripPlanner`, validado exclusivamente pelos testes do comportamento público.
+- A seleção do primeiro pedido ainda não foi generalizada, pois nesta etapa existe apenas um pedido viável.
+- A formação de múltiplas viagens e a inserção incremental permanecem fora do escopo.
+
+### Principais conclusões
+
+- O `TripPlanner` passou a executar um fluxo completo de planejamento para um subconjunto da especificação.
+- O algoritmo evoluiu sem introduzir abstrações antecipadas ou código morto.
+- A evolução incremental continua preservando cobertura completa por testes automatizados.
+
+### Lições aprendidas
+
+Implementar primeiro o menor cenário completo de planejamento simplifica a evolução do algoritmo. A partir dessa base, as próximas etapas poderão expandir naturalmente para múltiplos pedidos e múltiplas viagens sem necessidade de refatorações estruturais.
+
+### Próximo passo
+
+Implementar a formação de viagens com múltiplos pedidos viáveis, introduzindo a seleção do primeiro pedido e a inserção incremental de candidatos na rota.

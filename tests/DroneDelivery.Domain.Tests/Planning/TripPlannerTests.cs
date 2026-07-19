@@ -228,17 +228,31 @@ public class TripPlannerTests
     }
 
     [Fact]
-    public void Plan_WithValidDronesAndOrders_ShouldNotReturnProvisionalResult()
+    public void Plan_WithMultipleFeasibleOrders_ShouldThrowNotSupportedException()
     {
         var drones = new[]
         {
-            CreateDrone()
-        };
+        CreateDrone(
+            capacityKg: 20,
+            rangeKm: 100)
+    };
 
         var orders = new[]
         {
-            CreateOrder()
-        };
+        CreateOrder(
+            id: "ORDER-01",
+            weightKg: 5,
+            x: 3,
+            y: 4,
+            inputOrder: 0),
+
+        CreateOrder(
+            id: "ORDER-02",
+            weightKg: 4,
+            x: 6,
+            y: 8,
+            inputOrder: 1)
+    };
 
         Assert.Throws<NotSupportedException>(
             () => _planner.Plan(drones, orders));
@@ -368,24 +382,29 @@ public class TripPlannerTests
             impossibleOrder.Reason);
     }
     [Fact]
-    public void Plan_WhenSameDroneSupportsWeightAndRange_ShouldNotClassifyOrderAsImpossible()
+    public void Plan_WhenSameDroneSupportsWeightAndRange_ShouldCreateTrip()
     {
-        var drones = new[]
-        {
-        CreateDrone(
+        var drone = CreateDrone(
             capacityKg: 10,
-            rangeKm: 20)
-    };
+            rangeKm: 20);
 
         var order = CreateOrder(
             weightKg: 8,
             x: 7.5,
             y: 0);
 
-        Assert.Throws<NotSupportedException>(
-            () => _planner.Plan(
-                drones,
-                new[] { order }));
+        var result = _planner.Plan(
+            new[] { drone },
+            new[] { order });
+
+        Assert.Empty(result.ImpossibleOrders);
+
+        var trip = Assert.Single(result.Trips);
+
+        Assert.Same(drone, trip.Drone);
+
+        var plannedOrder = Assert.Single(trip.Orders);
+        Assert.Same(order, plannedOrder);
     }
     [Fact]
     public void Plan_WhenAllOrdersAreImpossible_ShouldReturnEachReason()
@@ -435,5 +454,235 @@ public class TripPlannerTests
                 item.Order.Id == "ORDER-RANGE"
                 && item.Reason
                     == ImpossibleReason.RangeExceeded);
+    }
+    [Fact]
+    public void Plan_WhenThereIsOneFeasibleOrder_ShouldCreateSingleOrderTrip()
+    {
+        var drone = CreateDrone(
+            capacityKg: 10,
+            rangeKm: 20);
+
+        var order = CreateOrder(
+            weightKg: 5,
+            x: 3,
+            y: 4);
+
+        var result = _planner.Plan(
+            new[] { drone },
+            new[] { order });
+
+        var trip = Assert.Single(result.Trips);
+
+        Assert.Empty(result.ImpossibleOrders);
+        Assert.Same(drone, trip.Drone);
+
+        var tripOrder = Assert.Single(trip.Orders);
+
+        Assert.Same(order, tripOrder);
+        Assert.Equal(5, trip.TotalWeightKg);
+        Assert.Equal(10, trip.TotalDistanceKm, 10);
+    }
+    [Fact]
+    public void Plan_WhenThereIsOneFeasibleOrderAndOneImpossibleOrder_ShouldReturnBoth()
+    {
+        var drone = CreateDrone(
+            capacityKg: 10,
+            rangeKm: 20);
+
+        var feasibleOrder = CreateOrder(
+            id: "ORDER-FEASIBLE",
+            weightKg: 5,
+            x: 3,
+            y: 4,
+            inputOrder: 0);
+
+        var impossibleOrder = CreateOrder(
+            id: "ORDER-IMPOSSIBLE",
+            weightKg: 15,
+            x: 1,
+            y: 0,
+            inputOrder: 1);
+
+        var result = _planner.Plan(
+            new[] { drone },
+            new[]
+            {
+            feasibleOrder,
+            impossibleOrder
+            });
+
+        var trip = Assert.Single(result.Trips);
+        var deliveredOrder = Assert.Single(trip.Orders);
+
+        Assert.Same(feasibleOrder, deliveredOrder);
+
+        var impossibleResult = Assert.Single(
+            result.ImpossibleOrders);
+
+        Assert.Same(
+            impossibleOrder,
+            impossibleResult.Order);
+
+        Assert.Equal(
+            ImpossibleReason.WeightExceeded,
+            impossibleResult.Reason);
+    }
+    [Fact]
+    public void Plan_WhenMultipleCompatibleDronesExist_ShouldSelectHighestCapacity()
+    {
+        var lowerCapacityDrone = CreateDrone(
+            id: "DRONE-LOWER-CAPACITY",
+            capacityKg: 10,
+            rangeKm: 100,
+            inputOrder: 0);
+
+        var higherCapacityDrone = CreateDrone(
+            id: "DRONE-HIGHER-CAPACITY",
+            capacityKg: 20,
+            rangeKm: 20,
+            inputOrder: 1);
+
+        var order = CreateOrder(
+            weightKg: 5,
+            x: 3,
+            y: 4);
+
+        var result = _planner.Plan(
+            new[]
+            {
+            lowerCapacityDrone,
+            higherCapacityDrone
+            },
+            new[] { order });
+
+        var trip = Assert.Single(result.Trips);
+
+        Assert.Same(higherCapacityDrone, trip.Drone);
+    }
+    [Fact]
+    public void Plan_WhenDroneCapacitiesAreEqual_ShouldSelectHighestRange()
+    {
+        var lowerRangeDrone = CreateDrone(
+            id: "DRONE-LOWER-RANGE",
+            capacityKg: 20,
+            rangeKm: 30,
+            inputOrder: 0);
+
+        var higherRangeDrone = CreateDrone(
+            id: "DRONE-HIGHER-RANGE",
+            capacityKg: 20,
+            rangeKm: 40,
+            inputOrder: 1);
+
+        var order = CreateOrder(
+            weightKg: 5,
+            x: 3,
+            y: 4);
+
+        var result = _planner.Plan(
+            new[]
+            {
+            lowerRangeDrone,
+            higherRangeDrone
+            },
+            new[] { order });
+
+        var trip = Assert.Single(result.Trips);
+
+        Assert.Same(higherRangeDrone, trip.Drone);
+    }
+    [Fact]
+    public void Plan_WhenCapacityAndRangeAreEqual_ShouldSelectLowestInputOrder()
+    {
+        var laterDrone = CreateDrone(
+            id: "DRONE-LATER",
+            capacityKg: 20,
+            rangeKm: 40,
+            inputOrder: 1);
+
+        var earlierDrone = CreateDrone(
+            id: "DRONE-EARLIER",
+            capacityKg: 20,
+            rangeKm: 40,
+            inputOrder: 0);
+
+        var order = CreateOrder(
+            weightKg: 5,
+            x: 3,
+            y: 4);
+
+        var result = _planner.Plan(
+            new[]
+            {
+            laterDrone,
+            earlierDrone
+            },
+            new[] { order });
+
+        var trip = Assert.Single(result.Trips);
+
+        Assert.Same(earlierDrone, trip.Drone);
+    }
+    [Fact]
+    public void Plan_WhenHighestCapacityDroneIsIncompatible_ShouldSelectCompatibleDrone()
+    {
+        var incompatibleDrone = CreateDrone(
+            id: "DRONE-INCOMPATIBLE",
+            capacityKg: 100,
+            rangeKm: 9,
+            inputOrder: 0);
+
+        var compatibleDrone = CreateDrone(
+            id: "DRONE-COMPATIBLE",
+            capacityKg: 10,
+            rangeKm: 20,
+            inputOrder: 1);
+
+        var order = CreateOrder(
+            weightKg: 5,
+            x: 3,
+            y: 4);
+
+        var result = _planner.Plan(
+            new[]
+            {
+            incompatibleDrone,
+            compatibleDrone
+            },
+            new[] { order });
+
+        var trip = Assert.Single(result.Trips);
+
+        Assert.Same(compatibleDrone, trip.Drone);
+    }
+    [Fact]
+    public void Plan_WhenThereAreMultipleFeasibleOrders_ShouldThrowNotSupportedException()
+    {
+        var drone = CreateDrone(
+            capacityKg: 20,
+            rangeKm: 100);
+
+        var firstOrder = CreateOrder(
+            id: "ORDER-01",
+            weightKg: 5,
+            x: 1,
+            y: 0,
+            inputOrder: 0);
+
+        var secondOrder = CreateOrder(
+            id: "ORDER-02",
+            weightKg: 5,
+            x: 2,
+            y: 0,
+            inputOrder: 1);
+
+        Assert.Throws<NotSupportedException>(
+            () => _planner.Plan(
+                new[] { drone },
+                new[]
+                {
+                firstOrder,
+                secondOrder
+                }));
     }
 }

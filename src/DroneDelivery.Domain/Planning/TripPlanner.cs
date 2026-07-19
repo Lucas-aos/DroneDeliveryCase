@@ -9,6 +9,8 @@ public class TripPlanner
 {
     private static readonly Coordinate BaseCoordinate = new(0, 0);
 
+    private static readonly NearestNeighborRouteCalculator RouteCalculator = new();
+
     public PlanningResult Plan(
         IEnumerable<Drone> drones,
         IEnumerable<Order> orders)
@@ -43,15 +45,74 @@ public class TripPlanner
             droneList,
             orderList);
 
-        if (impossibleOrders.Count == orderList.Count)
+        var impossibleOrderIds = impossibleOrders
+            .Select(item => item.Order.Id)
+            .ToHashSet(StringComparer.Ordinal);
+
+        var feasibleOrders = orderList
+            .Where(order => !impossibleOrderIds.Contains(order.Id))
+            .ToList();
+
+        if (feasibleOrders.Count == 0)
         {
             return new PlanningResult(
                 Array.Empty<Trip>(),
                 impossibleOrders);
         }
 
+        if (feasibleOrders.Count == 1)
+        {
+            var trip = CreateSingleOrderTrip(
+                droneList,
+                feasibleOrders[0]);
+
+            return new PlanningResult(
+                new[] { trip },
+                impossibleOrders);
+        }
+
         throw new NotSupportedException(
-            "Trip formation for feasible orders has not been implemented yet.");
+            "Trip formation for multiple feasible orders has not been implemented yet.");
+    }
+
+    private static Trip CreateSingleOrderTrip(
+    IReadOnlyCollection<Drone> drones,
+    Order order)
+    {
+        var routeResult = RouteCalculator.Calculate(
+            new[] { order });
+
+        var selectedDrone = SelectDrone(
+            drones,
+            order.WeightKg,
+            routeResult.TotalDistanceKm);
+
+        var totalWeightKg = routeResult.OrderedOrders
+            .Sum(routeOrder => routeOrder.WeightKg);
+
+        return new Trip(
+            selectedDrone,
+            routeResult.OrderedOrders,
+            totalWeightKg,
+            routeResult.TotalDistanceKm);
+    }
+
+    private static Drone SelectDrone(
+    IReadOnlyCollection<Drone> drones,
+    double requiredWeightKg,
+    double requiredRangeKm)
+    {
+        return drones
+            .Where(drone =>
+                drone.CapacityKg >= requiredWeightKg
+                && drone.RangeKm >= requiredRangeKm)
+            .OrderByDescending(drone => drone.CapacityKg)
+            .ThenByDescending(drone => drone.RangeKm)
+            .ThenBy(drone => drone.InputOrder)
+            .ThenBy(
+                drone => drone.Id,
+                StringComparer.Ordinal)
+            .First();
     }
 
     private static List<ImpossibleOrder> IdentifyImpossibleOrders(
