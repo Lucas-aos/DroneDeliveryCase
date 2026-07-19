@@ -552,3 +552,54 @@ A solution foi criada com os quatro projetos aprovados, as referências foram co
 ### Próximo passo
 
 Implementar a entidade `Drone` e seus testes unitários, mantendo o padrão incremental adotado.
+
+---
+
+## Sessão 9 — Implementação da entidade `Drone`
+
+### Objetivo
+
+Implementar a primeira entidade do domínio, garantindo a criação de objetos sempre em estado válido e validando suas invariantes por meio de testes unitários.
+
+### Resultado
+
+A entidade `Drone` foi implementada de forma imutável, com validações realizadas no construtor para impedir estados inválidos. Todas as regras definidas durante o planejamento foram verificadas por testes unitários, mantendo a implementação consistente com o modelo de domínio aprovado.
+
+### Atividades realizadas
+
+- Criação da entidade `Drone`;
+- Implementação das propriedades `Id`, `CapacityKg`, `RangeKm` e `InputOrder`;
+- Implementação das validações do construtor;
+- Validação de identificadores obrigatórios;
+- Validação de capacidade e alcance como valores positivos e finitos;
+- Validação da ordem de entrada;
+- Criação dos testes unitários da entidade;
+- Execução dos testes do domínio;
+- Validação do build completo da solution.
+
+### Decisões tomadas
+
+- `Drone` foi implementado como uma `class` imutável;
+- todas as propriedades são somente leitura;
+- o construtor impede a criação de objetos inválidos;
+- identificadores nulos, vazios ou compostos apenas por espaços são rejeitados;
+- capacidade e alcance devem ser valores finitos maiores que zero;
+- `InputOrder` deve ser maior ou igual a zero;
+- foram utilizadas apenas exceções padrão do .NET para validação dos argumentos;
+- as validações permaneceram explícitas na própria entidade, sem introduzir classes auxiliares de validação.
+
+### Principais conclusões
+
+- A primeira entidade do domínio foi implementada conforme o modelo conceitual aprovado;
+- as invariantes do objeto são garantidas durante sua criação;
+- o padrão de implementação adotado poderá ser reutilizado nas próximas entidades;
+- a suíte de testes do domínio passou a conter **32 testes aprovados**;
+- a solution permanece compilando sem erros.
+
+### Lições aprendidas
+
+Implementar entidades imutáveis com validações concentradas no construtor simplifica a garantia das invariantes do domínio e reduz a possibilidade de criação de objetos inconsistentes. A implementação incremental, acompanhada de testes unitários, facilita a identificação de problemas e estabelece uma base confiável para as próximas etapas do algoritmo.
+
+### Próximo passo
+
+Implementar a entidade `Order`, reutilizando os componentes já desenvolvidos (`Coordinate` e `Priority`) e mantendo o mesmo padrão de validação, imutabilidade e cobertura por testes unitários.
