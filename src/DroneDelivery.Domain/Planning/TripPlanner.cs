@@ -11,6 +11,11 @@ public class TripPlanner
 
     private static readonly NearestNeighborRouteCalculator RouteCalculator = new();
 
+    private record InsertionCandidate(
+    Order Order,
+    RouteCalculationResult Route,
+    double DistanceIncreaseKm);
+
     public PlanningResult Plan(
         IEnumerable<Drone> drones,
         IEnumerable<Order> orders)
@@ -60,43 +65,170 @@ public class TripPlanner
                 impossibleOrders);
         }
 
-        if (feasibleOrders.Count == 1)
-        {
-            var trip = CreateSingleOrderTrip(
-                droneList,
-                feasibleOrders[0]);
+        var firstOrder = SelectFirstOrder(feasibleOrders);
 
-            return new PlanningResult(
-                new[] { trip },
-                impossibleOrders);
-        }
-
-        throw new NotSupportedException(
-            "Trip formation for multiple feasible orders has not been implemented yet.");
-    }
-
-    private static Trip CreateSingleOrderTrip(
-    IReadOnlyCollection<Drone> drones,
-    Order order)
-    {
-        var routeResult = RouteCalculator.Calculate(
-            new[] { order });
+        var initialRoute = RouteCalculator.Calculate(
+            new[] { firstOrder });
 
         var selectedDrone = SelectDrone(
-            drones,
-            order.WeightKg,
-            routeResult.TotalDistanceKm);
+            droneList,
+            firstOrder.WeightKg,
+            initialRoute.TotalDistanceKm);
 
-        var totalWeightKg = routeResult.OrderedOrders
-            .Sum(routeOrder => routeOrder.WeightKg);
-
-        return new Trip(
+        var firstTrip = BuildFirstTrip(
             selectedDrone,
-            routeResult.OrderedOrders,
-            totalWeightKg,
-            routeResult.TotalDistanceKm);
+            firstOrder,
+            feasibleOrders);
+
+        var plannedOrderIds = firstTrip.Orders
+            .Select(order => order.Id)
+            .ToHashSet(StringComparer.Ordinal);
+
+        var hasRemainingFeasibleOrders = feasibleOrders.Any(
+            order => !plannedOrderIds.Contains(order.Id));
+
+        if (hasRemainingFeasibleOrders)
+        {
+            throw new NotSupportedException(
+                "Formation of additional trips has not been implemented yet.");
+        }
+
+        return new PlanningResult(
+            new[] { firstTrip },
+            impossibleOrders);
     }
 
+    private static Order SelectFirstOrder(
+    IEnumerable<Order> orders)
+    {
+        return orders
+            .OrderByDescending(
+                order => GetPriorityRank(order.Priority))
+            .ThenByDescending(order => order.WeightKg)
+            .ThenBy(order => order.InputOrder)
+            .ThenBy(
+                order => order.Id,
+                StringComparer.Ordinal)
+            .First();
+    }
+    private static int GetPriorityRank(Priority priority)
+    {
+        return priority switch
+        {
+            Priority.High => 3,
+            Priority.Medium => 2,
+            Priority.Low => 1,
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(priority),
+                priority,
+                "Unsupported priority.")
+        };
+    }
+    private static Trip BuildFirstTrip(
+    Drone drone,
+    Order firstOrder,
+    IReadOnlyCollection<Order> feasibleOrders)
+    {
+        var selectedOrders = new List<Order>
+    {
+        firstOrder
+    };
+
+        var remainingOrders = feasibleOrders
+            .Where(order =>
+                !string.Equals(
+                    order.Id,
+                    firstOrder.Id,
+                    StringComparison.Ordinal))
+            .ToList();
+
+        var currentRoute = RouteCalculator.Calculate(
+            selectedOrders);
+
+        while (remainingOrders.Count > 0)
+        {
+            var candidate = FindBestInsertionCandidate(
+                drone,
+                selectedOrders,
+                remainingOrders,
+                currentRoute.TotalDistanceKm);
+
+            if (candidate is null)
+            {
+                break;
+            }
+
+            selectedOrders.Add(candidate.Order);
+
+            remainingOrders.RemoveAll(order =>
+                string.Equals(
+                    order.Id,
+                    candidate.Order.Id,
+                    StringComparison.Ordinal));
+
+            currentRoute = candidate.Route;
+        }
+
+        var totalWeightKg = currentRoute.OrderedOrders
+            .Sum(order => order.WeightKg);
+
+        return new Trip(
+            drone,
+            currentRoute.OrderedOrders,
+            totalWeightKg,
+            currentRoute.TotalDistanceKm);
+    }
+    private static InsertionCandidate? FindBestInsertionCandidate(
+    Drone drone,
+    IReadOnlyCollection<Order> selectedOrders,
+    IReadOnlyCollection<Order> remainingOrders,
+    double currentDistanceKm)
+    {
+        var currentWeightKg = selectedOrders
+            .Sum(order => order.WeightKg);
+
+        InsertionCandidate? bestCandidate = null;
+
+        foreach (var order in remainingOrders)
+        {
+            var simulatedWeightKg =
+                currentWeightKg + order.WeightKg;
+
+            if (simulatedWeightKg > drone.CapacityKg)
+            {
+                continue;
+            }
+
+            var simulatedOrders = selectedOrders
+                .Append(order)
+                .ToList();
+
+            var simulatedRoute = RouteCalculator.Calculate(
+                simulatedOrders);
+
+            if (simulatedRoute.TotalDistanceKm > drone.RangeKm)
+            {
+                continue;
+            }
+
+            var distanceIncreaseKm =
+                simulatedRoute.TotalDistanceKm
+                - currentDistanceKm;
+
+            if (bestCandidate is null
+                || distanceIncreaseKm
+                    < bestCandidate.DistanceIncreaseKm)
+            {
+                bestCandidate = new InsertionCandidate(
+                    order,
+                    simulatedRoute,
+                    distanceIncreaseKm);
+            }
+        }
+
+        return bestCandidate;
+    }
     private static Drone SelectDrone(
     IReadOnlyCollection<Drone> drones,
     double requiredWeightKg,
@@ -257,4 +389,5 @@ public class TripPlanner
                 nameof(orders));
         }
     }
+
 }

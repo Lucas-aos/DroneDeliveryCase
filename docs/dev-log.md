@@ -1000,3 +1000,54 @@ Implementar primeiro o menor cenário completo de planejamento simplifica a evol
 ### Próximo passo
 
 Implementar a formação de viagens com múltiplos pedidos viáveis, introduzindo a seleção do primeiro pedido e a inserção incremental de candidatos na rota.
+
+---
+
+## Sessão 18 — Formação da primeira viagem com múltiplos pedidos
+
+### Objetivo
+
+Expandir o `TripPlanner` para formar a primeira viagem contendo múltiplos pedidos viáveis, reutilizando o algoritmo de roteamento e respeitando as restrições de capacidade e alcance durante todo o processo de planejamento.
+
+### Resultado
+
+Foi implementada a formação incremental da primeira viagem. O algoritmo passa a selecionar um pedido inicial, simular a inclusão de todos os pedidos restantes, recalcular a rota utilizando o `NearestNeighborRouteCalculator` e incorporar iterativamente o candidato que produz o menor aumento de distância, desde que respeite os limites do drone.
+
+Quando todos os pedidos viáveis são atendidos na primeira viagem, o `PlanningResult` é retornado normalmente. Caso permaneçam pedidos viáveis, o comportamento continua sendo lançar `NotSupportedException`, preservando a implementação incremental do algoritmo.
+
+A suíte completa passou a conter **130 testes aprovados**.
+
+### Atividades realizadas
+
+- Implementação da seleção do primeiro pedido;
+- adaptação da seleção do drone ao novo fluxo;
+- implementação da formação incremental da primeira viagem;
+- simulação de todos os candidatos restantes;
+- validação de peso e alcance a cada inserção;
+- recálculo da rota após cada inclusão utilizando o `NearestNeighborRouteCalculator`;
+- criação dos testes unitários para múltiplos pedidos;
+- execução completa da suíte de testes;
+- validação do build da solution.
+
+### Decisões tomadas
+
+- A formação da viagem reutiliza integralmente o `NearestNeighborRouteCalculator`;
+- o candidato escolhido é aquele que produz o menor aumento de distância;
+- não foi definida uma regra de desempate para candidatos com o mesmo aumento de distância;
+- a implementação permanece restrita à formação da primeira viagem;
+- pedidos impossíveis continuam sendo retornados juntamente com o resultado do planejamento.
+
+### Principais conclusões
+
+- O `TripPlanner` passou a planejar viagens com múltiplos pedidos;
+- a lógica de formação da viagem permaneceu isolada da futura formação de múltiplas viagens;
+- a evolução incremental do algoritmo foi preservada;
+- a suíte atingiu **130 testes aprovados**.
+
+### Lições aprendidas
+
+A implementação incremental permitiu expandir o algoritmo sem introduzir código não exercitado pelos testes. Ao concentrar a lógica de construção da viagem em uma única responsabilidade, a futura implementação do planejamento de múltiplas viagens poderá reutilizar esse comportamento com poucas alterações.
+
+### Próximo passo
+
+Implementar o laço externo do planejamento para formar todas as viagens necessárias até consumir todos os pedidos viáveis, reutilizando a lógica de formação da primeira viagem desenvolvida nesta etapa.
