@@ -1,9 +1,13 @@
+using DroneDelivery.Api.Storage;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSingleton<InMemoryPlanningStore>();
 
 var app = builder.Build();
 

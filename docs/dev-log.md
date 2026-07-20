@@ -1980,3 +1980,71 @@ Foram implementados testes cobrindo os principais cenários de sucesso, validaç
 ### Próximo passo
 
 Realizar a revisão final da solução, atualizar a documentação e preparar o encerramento do projeto.
+
+---
+
+## Sessão 33 — Planejamentos como recursos REST em memória
+
+### Objetivo
+
+Evoluir o planejamento para um recurso REST identificável e recuperável, utilizando armazenamento temporário em memória.
+
+### Resultado
+
+O endpoint `POST /api/planning` passou a:
+
+- gerar um `planningId`;
+- armazenar o cenário completo em memória;
+- retornar `201 Created`;
+- incluir o cabeçalho `Location`.
+
+Também foi criado o endpoint:
+
+```http
+GET /api/planning/{planningId}
+```
+
+para recuperar um planejamento existente.
+
+### Implementações
+
+- criação de `StoredPlanningScenario`;
+- criação de `InMemoryPlanningStore`;
+- utilização de `ConcurrentDictionary`;
+- registro do store como `Singleton`;
+- criação de `PlanningCreatedResponse`;
+- alteração do `POST` para retornar `201 Created`;
+- implementação do `GET` por identificador;
+- retorno de `404 Not Found` para IDs inexistentes;
+- armazenamento de cópias defensivas de drones e pedidos;
+- atualização da suíte de testes de integração.
+
+### Decisões
+
+- o armazenamento permanece exclusivamente em memória;
+- os dados são perdidos ao reiniciar a aplicação;
+- não foi adicionado banco de dados;
+- o domínio e o `TripPlanner` permaneceram inalterados;
+- nenhuma análise de frota ou dashboard foi implementada nesta etapa.
+
+### Validação
+
+- ✅ `POST` retorna `201 Created`;
+- ✅ resposta contém `planningId` e `createdAtUtc`;
+- ✅ cabeçalho `Location` aponta para o recurso criado;
+- ✅ `GET` recupera corretamente um planejamento existente;
+- ✅ identificadores inexistentes retornam `404 Not Found`;
+- ✅ requisições inválidas continuam retornando `400 Bad Request`;
+- ✅ pedidos impossíveis continuam sendo representados corretamente;
+- ✅ todos os testes de integração aprovados.
+
+### Próximo passo
+
+Implementar os endpoints especializados:
+
+```http
+GET /api/planning/{planningId}/routes
+GET /api/planning/{planningId}/drones
+```
+
+reutilizando o cenário armazenado, preparando a base para o módulo de análise da frota e o dashboard.

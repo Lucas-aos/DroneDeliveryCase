@@ -1,6 +1,7 @@
 using DroneDelivery.Api.Contracts.Requests;
 using DroneDelivery.Api.Contracts.Responses;
 using DroneDelivery.Api.Mapping;
+using DroneDelivery.Api.Storage;
 using DroneDelivery.Domain.Planning;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,22 @@ namespace DroneDelivery.Api.Controllers;
 [Route("api/planning")]
 public sealed class PlanningController : ControllerBase
 {
+    private readonly InMemoryPlanningStore _store;
+
+    public PlanningController(InMemoryPlanningStore store)
+    {
+        _store = store;
+    }
+
     [HttpPost]
-    [ProducesResponseType(typeof(PlanningResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    public ActionResult<PlanningResponse> Plan(PlanningRequest request)
+    [ProducesResponseType(
+        typeof(PlanningCreatedResponse),
+        StatusCodes.Status201Created)]
+    [ProducesResponseType(
+        typeof(ErrorResponse),
+        StatusCodes.Status400BadRequest)]
+    public ActionResult<PlanningCreatedResponse> Plan(
+        PlanningRequest request)
     {
         try
         {
@@ -24,17 +37,62 @@ public sealed class PlanningController : ControllerBase
 
             var planningResult = planner.Plan(drones, orders);
 
-            var response = PlanningMapper.ToResponse(planningResult);
+            var planningResponse =
+                PlanningMapper.ToResponse(planningResult);
 
-            return Ok(response);
+            var planningId = Guid.NewGuid();
+            var createdAtUtc = DateTimeOffset.UtcNow;
+
+            var scenario = new StoredPlanningScenario
+            {
+                PlanningId = planningId,
+                CreatedAtUtc = createdAtUtc,
+                Drones = drones.ToArray(),
+                Orders = orders.ToArray(),
+                Result = planningResult
+            };
+
+            _store.Add(scenario);
+
+            var createdResponse = new PlanningCreatedResponse
+            {
+                PlanningId = planningId,
+                CreatedAtUtc = createdAtUtc,
+                Planning = planningResponse
+            };
+
+            return CreatedAtAction(
+                nameof(GetPlanning),
+                new { planningId },
+                createdResponse);
         }
         catch (ArgumentException ex)
         {
             return BadRequest(CreateErrorResponse(ex));
         }
     }
+
+    [HttpGet("{planningId:guid}")]
+    [ProducesResponseType(
+        typeof(PlanningResponse),
+        StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<PlanningResponse> GetPlanning(
+        Guid planningId)
+    {
+        if (!_store.TryGet(planningId, out var scenario))
+        {
+            return NotFound();
+        }
+
+        var response =
+            PlanningMapper.ToResponse(scenario!.Result);
+
+        return Ok(response);
+    }
+
     private static ErrorResponse CreateErrorResponse(
-    ArgumentException exception)
+        ArgumentException exception)
     {
         return new ErrorResponse
         {
