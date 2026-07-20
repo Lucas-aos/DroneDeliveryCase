@@ -18,6 +18,7 @@ O projeto demonstra conhecimentos práticos em desenvolvimento backend, modelage
 
 - [Visão Geral](#visão-geral)
 - [Principais Funcionalidades](#principais-funcionalidades)
+- [Demonstração](#demonstração)
 - [Arquitetura da Solução](#arquitetura-da-solução)
 - [Tecnologias Utilizadas](#tecnologias-utilizadas)
 - [Estrutura do Projeto](#estrutura-do-projeto)
@@ -67,6 +68,26 @@ O dashboard consome os mesmos endpoints públicos da API e não replica nenhuma 
 - Testes automatizados de domínio e integração da API
 - Documentação da API com Swagger/OpenAPI
 - Sem dependência de frameworks frontend ou bibliotecas externas de gráficos
+
+---
+
+## Demonstração
+
+## Dashboard
+
+![Dashboard](docs/images/dashboard-overview.png)
+
+## Visualização das Rotas
+
+![Routes](docs/images/dashboard-routes.png)
+
+## Recomendações
+
+![Fleet Recommendations](docs/images/fleet-recommendations.png)
+
+## Swagger
+
+![Swagger](docs/images/swagger-endpoints.png)
 
 ---
 
