@@ -47,25 +47,6 @@ The application evaluates whether each order can be served, generates delivery t
 The dashboard consumes the same public API endpoints and does not duplicate business logic in the browser.
 
 ---
-## Demo
-
-## Dashboard
-
-![Dashboard](docs/images/dashboard-overview.png)
-
-## Routes
-
-![Routes](docs/images/dashboard-routes.png)
-
-## Recommendations
-
-![Fleet Recommendations](docs/images/fleet-recommendations.png)
-
-## Swagger
-
-![Swagger](docs/images/swagger-endpoints.png)
-
----
 
 ## Key Features
 
@@ -87,6 +68,27 @@ The dashboard consumes the same public API endpoints and does not duplicate busi
 - Automated domain and API integration tests
 - Swagger/OpenAPI documentation
 - No frontend framework or external charting library required
+
+---
+
+---
+## Demo
+
+## Dashboard
+
+![Dashboard](docs/images/dashboard-overview.png)
+
+## Routes
+
+![Routes](docs/images/dashboard-routes.png)
+
+## Recommendations
+
+![Fleet Recommendations](docs/images/fleet-recommendations.png)
+
+## Swagger
+
+![Swagger](docs/images/swagger-endpoints.png)
 
 ---
 
