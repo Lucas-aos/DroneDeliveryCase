@@ -1,0 +1,279 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Drone Delivery Planner</title>
+
+    <link rel="stylesheet"
+          href="/dashboard/dashboard.css">
+</head>
+
+<body>
+    <header class="topbar">
+        <div class="topbar__content">
+            <div>
+                <p class="eyebrow">
+                    Operational planning dashboard
+                </p>
+
+                <h1>Drone Delivery Planner</h1>
+
+                <p class="topbar__description">
+                    Plan deliveries, inspect routes and evaluate
+                    fleet performance.
+                </p>
+            </div>
+
+            <div class="topbar__actions">
+                <a class="button button--secondary"
+                   href="/swagger"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    Open Swagger
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <section id="notification"
+                 class="notification hidden"
+                 role="alert">
+        </section>
+
+        <section class="workspace-grid">
+            <article class="panel">
+                <div class="panel__header">
+                    <div>
+                        <p class="section-label">
+                            New planning
+                        </p>
+
+                        <h2>Create a planning scenario</h2>
+                    </div>
+                </div>
+
+                <p class="panel__description">
+                    Edit the example request and submit it to the
+                    planning API.
+                </p>
+
+                <label class="field-label"
+                       for="planningRequest">
+                    Planning request
+                </label>
+
+                <textarea id="planningRequest"
+                          class="json-editor"
+                          spellcheck="false"></textarea>
+
+                <div class="button-row">
+                    <button id="createPlanningButton"
+                            class="button button--primary"
+                            type="button">
+                        Create planning
+                    </button>
+
+                    <button id="resetExampleButton"
+                            class="button button--secondary"
+                            type="button">
+                        Reset example
+                    </button>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel__header">
+                    <div>
+                        <p class="section-label">
+                            Existing planning
+                        </p>
+
+                        <h2>Load by planning ID</h2>
+                    </div>
+                </div>
+
+                <p class="panel__description">
+                    Enter a previously generated identifier to load
+                    its operational dashboard.
+                </p>
+
+                <label class="field-label"
+                       for="planningIdInput">
+                    Planning ID
+                </label>
+
+                <input id="planningIdInput"
+                       class="text-input"
+                       type="text"
+                       autocomplete="off"
+                       placeholder="00000000-0000-0000-0000-000000000000">
+
+                <div class="button-row">
+                    <button id="loadPlanningButton"
+                            class="button button--primary"
+                            type="button">
+                        Load dashboard
+                    </button>
+
+                    <button id="copyPlanningIdButton"
+                            class="button button--secondary"
+                            type="button"
+                            disabled>
+                        Copy ID
+                    </button>
+                </div>
+
+                <div id="currentPlanningCard"
+                     class="current-planning hidden">
+                    <span class="current-planning__label">
+                        Current planning
+                    </span>
+
+                    <strong id="currentPlanningId">
+                        —
+                    </strong>
+
+                    <span id="currentPlanningDate">
+                        —
+                    </span>
+                </div>
+            </article>
+        </section>
+
+        <section id="dashboardContent"
+                 class="dashboard-content hidden">
+
+            <section class="section-block">
+                <div class="section-heading">
+                    <div>
+                        <p class="section-label">
+                            Overview
+                        </p>
+
+                        <h2>Planning indicators</h2>
+                    </div>
+                </div>
+
+                <div id="kpiGrid"
+                     class="kpi-grid">
+                </div>
+            </section>
+
+            <section class="section-block">
+                <div class="section-heading">
+                    <div>
+                        <p class="section-label">
+                            Fleet intelligence
+                        </p>
+
+                        <h2>Recommendations</h2>
+                    </div>
+                </div>
+
+                <div id="recommendationsGrid"
+                     class="recommendations-grid">
+                </div>
+            </section>
+
+            <section class="section-block">
+                <div class="section-heading">
+                    <div>
+                        <p class="section-label">
+                            Fleet performance
+                        </p>
+
+                        <h2>Drone analysis</h2>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Drone</th>
+                                <th>Status</th>
+                                <th>Trips</th>
+                                <th>Orders</th>
+                                <th>Weight</th>
+                                <th>Distance</th>
+                                <th>Efficiency</th>
+                                <th>Average load</th>
+                                <th>Average battery</th>
+                                <th>Maximum battery</th>
+                                <th>Estimated time</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="droneAnalysisTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="section-block">
+                <div class="section-heading">
+                    <div>
+                        <p class="section-label">
+                            Route visualization
+                        </p>
+
+                        <h2>Delivery routes</h2>
+                    </div>
+
+                    <div class="route-legend">
+                        <span>
+                            <i class="legend-marker legend-marker--depot"></i>
+                            Depot
+                        </span>
+
+                        <span>
+                            <i class="legend-marker legend-marker--order"></i>
+                            Delivery
+                        </span>
+                    </div>
+                </div>
+
+                <div id="routesGrid"
+                     class="routes-grid">
+                </div>
+            </section>
+
+            <section class="section-block">
+                <div class="section-heading">
+                    <div>
+                        <p class="section-label">
+                            Exceptions
+                        </p>
+
+                        <h2>Impossible orders</h2>
+                    </div>
+                </div>
+
+                <div id="impossibleOrdersContainer"
+                     class="empty-state">
+                    No impossible orders were identified.
+                </div>
+            </section>
+        </section>
+
+        <section id="loadingOverlay"
+                 class="loading-overlay hidden"
+                 aria-live="polite">
+            <div class="spinner"></div>
+            <span>Loading planning data...</span>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <span>Drone Delivery Planner</span>
+        <span>ASP.NET Core · REST API · Native JavaScript</span>
+    </footer>
+
+    <script src="/dashboard/dashboard.js"></script>
+</body>
+</html>

@@ -27,11 +27,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGet("/", () => Results.Redirect("/swagger"));
+app.MapGet("/", () =>
+    Results.Redirect("/dashboard"));
+
+app.MapGet("/dashboard", () =>
+    Results.Redirect("/dashboard/index.html"));
 
 app.Run();
 

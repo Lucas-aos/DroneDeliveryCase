@@ -2210,3 +2210,67 @@ As recomendações passaram a utilizar categoria e severidade como conceitos dis
 ### Próximo passo
 
 Iniciar a **Etapa 6.4 — Dashboard**, criando uma interface estática com HTML, CSS e JavaScript para consumir os endpoints da API.
+
+---
+
+## Sessão 37 — Implementação do Dashboard Operacional
+
+### Objetivo
+
+Implementar a interface web da aplicação utilizando apenas HTML, CSS, JavaScript e SVG nativo, consumindo exclusivamente os endpoints da API já desenvolvida.
+
+### Resultado
+
+Foi desenvolvido um dashboard operacional completo, permitindo criar planejamentos, consultar planejamentos existentes, visualizar indicadores da frota, analisar drones, inspecionar rotas graficamente e acompanhar recomendações operacionais em uma única interface.
+
+### Implementações
+
+- criação da estrutura do dashboard em `wwwroot/dashboard`;
+- implementação da página principal (`index.html`);
+- desenvolvimento do layout responsivo (`dashboard.css`);
+- implementação da lógica da aplicação (`dashboard.js`);
+- integração completa com os endpoints da API;
+- criação de planejamento diretamente pela interface;
+- carregamento de planejamentos existentes por `PlanningId`;
+- cópia do identificador do planejamento para a área de transferência;
+- exibição dos indicadores principais (KPIs);
+- renderização da análise completa da frota;
+- renderização das recomendações por categoria e severidade;
+- exibição da tabela detalhada dos drones;
+- renderização gráfica das rotas utilizando SVG nativo;
+- exibição dos pedidos impossíveis;
+- notificações de sucesso, erro e informação;
+- loading overlay durante chamadas da API;
+- atualização automática da URL com o `PlanningId`.
+
+### Decisões
+
+- utilização exclusiva de HTML, CSS, JavaScript e SVG nativo;
+- nenhuma dependência externa para visualização das rotas;
+- consumo exclusivamente da API pública desenvolvida no projeto;
+- separação entre estrutura, estilos e lógica (`HTML`, `CSS` e `JavaScript`);
+- dashboard tratado como painel operacional e não apenas página demonstrativa;
+- reutilização integral do contrato HTTP existente, sem necessidade de alterações na API.
+
+### Validação
+
+- ✅ criação de planejamento funcionando;
+- ✅ carregamento por `PlanningId` funcionando;
+- ✅ consumo de todos os endpoints da API;
+- ✅ renderização correta dos KPIs;
+- ✅ análise da frota exibida corretamente;
+- ✅ recomendações apresentadas por categoria e severidade;
+- ✅ rotas desenhadas corretamente em SVG;
+- ✅ pedidos impossíveis apresentados corretamente;
+- ✅ interface responsiva;
+- ✅ testes da API permanecem aprovados (15/15).
+
+### Próximo passo
+
+Documentar o projeto para publicação:
+
+- elaboração do README profissional;
+- criação do diagrama de arquitetura;
+- geração de GIF demonstrativo do dashboard;
+- captura das telas do Swagger e Dashboard;
+- revisão final do repositório para publicação no GitHub.
