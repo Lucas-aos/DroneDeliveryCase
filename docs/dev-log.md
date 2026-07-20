@@ -1817,3 +1817,47 @@ Centralizar o mapeamento entre contratos HTTP e modelos do domínio reduz o acop
 ## Próximo passo
 
 Integrar o `PlanningController` ao `TripPlanner`, utilizando o `PlanningMapper` para converter os contratos de entrada e, posteriormente, implementar o mapeamento do `PlanningResult` para `PlanningResponse`.
+
+---
+
+---
+
+## Sessão 29 — Mapeamento do resultado do domínio para a resposta da API
+
+### Objetivo
+
+Implementar o mapeamento responsável por converter o `PlanningResult` em `PlanningResponse`, concluindo o fluxo de conversão entre o domínio e a camada HTTP.
+
+### Resultado
+
+Foi implementado o mapeamento das respostas da API, convertendo viagens e pedidos impossíveis do domínio para seus respectivos DTOs. Com isso, o `PlanningMapper` passou a realizar a conversão completa nos dois sentidos entre os contratos HTTP e o domínio.
+
+### Atividades realizadas
+
+- Implementação do método `ToResponse`;
+- implementação do método `ToTripResponse`;
+- implementação do método `ToImpossibleOrderResponse`;
+- geração da sequência das entregas durante o mapeamento;
+- adaptação da implementação às propriedades reais do domínio;
+- validação do build da solution.
+
+### Decisões tomadas
+
+- O mapeamento de resposta permanecerá centralizado em `PlanningMapper`;
+- a API continuará responsável pela representação dos contratos HTTP;
+- o domínio permanecerá independente de detalhes da camada de apresentação;
+- nenhuma regra de negócio foi adicionada ao mapper.
+
+### Principais conclusões
+
+- O fluxo de conversão entre API e domínio foi concluído;
+- o `PlanningMapper` passou a concentrar todo o mapeamento entre contratos HTTP e modelos do domínio;
+- a arquitetura definida para a API foi preservada.
+
+### Lições aprendidas
+
+Adaptar o mapeamento às assinaturas reais do domínio reduz retrabalho e evita acoplamento entre a API e a implementação interna das entidades.
+
+### Próximo passo
+
+Conectar o `PlanningController` ao `TripPlanner`, substituindo a resposta temporária pela execução real do planejamento.

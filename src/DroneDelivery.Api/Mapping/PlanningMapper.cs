@@ -1,4 +1,5 @@
 using DroneDelivery.Api.Contracts.Requests;
+using DroneDelivery.Api.Contracts.Responses;
 using DroneDelivery.Domain.Entities;
 using DroneDelivery.Domain.Enums;
 using DroneDelivery.Domain.ValueObjects;
@@ -38,6 +39,53 @@ public static class PlanningMapper
                     MapPriority(request.Priority),
                     index))
             .ToArray();
+    }
+
+    public static PlanningResponse ToResponse(
+        PlanningResult planningResult)
+    {
+        ArgumentNullException.ThrowIfNull(planningResult);
+
+        return new PlanningResponse
+        {
+            Trips = planningResult.Trips
+                .Select(ToTripResponse)
+                .ToArray(),
+
+            ImpossibleOrders = planningResult.ImpossibleOrders
+                .Select(ToImpossibleOrderResponse)
+                .ToArray()
+        };
+    }
+
+    private static TripResponse ToTripResponse(
+        Trip trip)
+    {
+        return new TripResponse
+        {
+            DroneId = trip.Drone.Id,
+
+            Orders = trip.Orders
+                .Select((order, index) => new TripOrderResponse
+                {
+                    Id = order.Id,
+                    Sequence = index + 1
+                })
+                .ToArray(),
+
+            TotalWeightKg = trip.TotalWeightKg,
+            TotalDistanceKm = trip.TotalDistanceKm
+        };
+    }
+
+    private static ImpossibleOrderResponse ToImpossibleOrderResponse(
+        ImpossibleOrder impossibleOrder)
+    {
+        return new ImpossibleOrderResponse
+        {
+            OrderId = impossibleOrder.Order.Id,
+            Reason = impossibleOrder.Reason.ToString()
+        };
     }
 
     private static Priority MapPriority(string priority)
