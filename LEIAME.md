@@ -960,7 +960,7 @@ O desenvolvimento deste projeto foi realizado de forma incremental, com registro
 
 ## Autor
 
-Desenvolvido como um projeto de portfólio em Engenharia de Software, com foco em:
+Desenvolvido por Lucas Santos como um projeto de portfólio em Engenharia de Software, com foco em:
 
 - desenvolvimento backend;
 - ASP.NET Core;
