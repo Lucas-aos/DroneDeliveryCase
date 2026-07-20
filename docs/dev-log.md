@@ -2150,3 +2150,63 @@ GET /api/planning/{planningId}/fleet-analysis
 ```
 
 integrando o `FleetAdvisor` ao `PlanningMapper` para disponibilizar a análise completa por meio da API.
+
+---
+
+## Sessão 36 — Refinamento das recomendações da análise de frota
+
+### Objetivo
+
+Estabilizar o contrato da análise de frota antes da implementação do dashboard, tornando as recomendações mais expressivas, seguras e adequadas para consumo pela camada de apresentação.
+
+### Resultado
+
+As recomendações passaram a utilizar categoria e severidade como conceitos distintos. Internamente, esses valores são representados por enums, enquanto o contrato HTTP continua expondo strings amigáveis no JSON.
+
+### Implementações
+
+- criação do enum interno `RecommendationType`;
+- criação do enum interno `RecommendationSeverity`;
+- atualização do modelo `FleetRecommendation`;
+- inclusão da propriedade `Severity` no `FleetRecommendationResponse`;
+- atualização do `PlanningMapper` para converter os enums em strings;
+- separação das recomendações de capacidade e alcance;
+- revisão dos títulos e das descrições geradas pelo `FleetAdvisor`;
+- manutenção dos campos opcionais de capacidade e alcance mínimos sugeridos para pedidos impossíveis.
+
+### Categorias de recomendação
+
+- `FleetUtilization`;
+- `Capacity`;
+- `Range`;
+- `ImpossibleOrders`;
+- `Performance`.
+
+### Severidades
+
+- `Success`;
+- `Information`;
+- `Warning`;
+- `Critical`.
+
+### Decisões
+
+- `Type` representa o assunto ou a categoria da recomendação;
+- `Severity` representa o nível de importância;
+- os enums permanecem internos ao módulo de análise;
+- os DTOs HTTP continuam utilizando strings;
+- o `PlanningMapper` permanece responsável pela conversão para o contrato externo;
+- carga e alcance geram recomendações independentes, evitando categorias ambíguas;
+- o contrato da análise foi considerado estável para o desenvolvimento do dashboard.
+
+### Validação
+
+- ✅ projeto compilado com sucesso;
+- ✅ recomendações de capacidade e alcance separadas corretamente;
+- ✅ enums convertidos corretamente para strings no response;
+- ✅ mensagens revisadas e orientadas à ação;
+- ✅ testes existentes executados e aprovados.
+
+### Próximo passo
+
+Iniciar a **Etapa 6.4 — Dashboard**, criando uma interface estática com HTML, CSS e JavaScript para consumir os endpoints da API.

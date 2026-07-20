@@ -12,6 +12,8 @@ public sealed class FleetAdvisor
     public FleetAdvisor(
         IOptions<FleetAnalysisOptions> options)
     {
+        ArgumentNullException.ThrowIfNull(options);
+
         _options = options.Value;
 
         if (_options.DroneSpeedKmPerHour <= 0)
@@ -95,7 +97,8 @@ public sealed class FleetAdvisor
                         : batteryUsageValues.Max();
 
                 var estimatedTimeMinutes =
-                    CalculateEstimatedTimeMinutes(distance);
+                    CalculateEstimatedTimeMinutes(
+                        distance);
 
                 return new DroneAnalysis
                 {
@@ -103,9 +106,12 @@ public sealed class FleetAdvisor
                     WasUsed = tripCount > 0,
                     TripCount = tripCount,
                     DeliveredOrders = deliveredOrders,
-                    DeliveredWeightKg = Round(deliveredWeight),
-                    DistanceKm = Round(distance),
-                    EfficiencyKgPerKm = Round(efficiency),
+                    DeliveredWeightKg =
+                        Round(deliveredWeight),
+                    DistanceKm =
+                        Round(distance),
+                    EfficiencyKgPerKm =
+                        Round(efficiency),
                     AverageLoadFactorPercentage =
                         Round(averageLoadFactor),
                     AverageBatteryUsagePerTripPercentage =
@@ -146,19 +152,11 @@ public sealed class FleetAdvisor
 
         var allTripLoadFactors = trips
             .Select(trip =>
-            {
-                var drone = drones.First(
-                    candidate => string.Equals(
-                        candidate.Id,
-                        trip.Drone.Id,
-                        StringComparison.OrdinalIgnoreCase));
-
-                return CalculatePercentageSafe(
+                CalculatePercentageSafe(
                     Convert.ToDouble(
                         trip.TotalWeightKg),
                     Convert.ToDouble(
-                        drone.CapacityKg));
-            })
+                        trip.Drone.CapacityKg)))
             .ToArray();
 
         var averageLoadFactor =
@@ -167,9 +165,9 @@ public sealed class FleetAdvisor
                 : allTripLoadFactors.Average();
 
         var fleetEfficiency =
-             CalculateRatioSafe(
-                 totalDeliveredWeight,
-                 totalDistance);
+            CalculateRatioSafe(
+                totalDeliveredWeight,
+                totalDistance);
 
         var estimatedTotalTime =
             CalculateEstimatedTimeMinutes(
@@ -190,7 +188,8 @@ public sealed class FleetAdvisor
             ImpossibleOrders = impossibleOrders,
             TotalDeliveredWeightKg =
                 Round(totalDeliveredWeight),
-            TotalDistanceKm = Round(totalDistance),
+            TotalDistanceKm =
+                Round(totalDistance),
             FleetParticipationPercentage =
                 Round(fleetParticipation),
             AverageLoadFactorPercentage =
@@ -221,6 +220,26 @@ public sealed class FleetAdvisor
                     scenario));
         }
 
+        if (averageLoadFactor
+            >= _options
+                .HighAverageLoadThresholdPercentage)
+        {
+            recommendations.Add(
+                new FleetRecommendation
+                {
+                    Type =
+                        RecommendationType.Capacity,
+                    Severity =
+                        RecommendationSeverity.Warning,
+                    Title =
+                        "Fleet Near Capacity",
+                    Description =
+                        "One or more trips are operating close to the " +
+                        "configured payload limit. Consider increasing " +
+                        "drone capacity or redistributing deliveries."
+                });
+        }
+
         var hasTripNearRangeLimit =
             droneAnalyses.Any(
                 drone =>
@@ -228,35 +247,43 @@ public sealed class FleetAdvisor
                     >= _options
                         .HighRangeUsageThresholdPercentage);
 
-        if (averageLoadFactor
-                >= _options
-                    .HighAverageLoadThresholdPercentage
-            || hasTripNearRangeLimit)
+        if (hasTripNearRangeLimit)
         {
             recommendations.Add(
                 new FleetRecommendation
                 {
-                    Type = "Warning",
-                    Title = "Fleet Near Capacity",
+                    Type =
+                        RecommendationType.Range,
+                    Severity =
+                        RecommendationSeverity.Warning,
+                    Title =
+                        "Fleet Near Range Limit",
                     Description =
-                        "The fleet has trips with high load or range usage. " +
-                        "Consider reviewing drone capacity and operational range."
+                        "One or more trips are operating close to the " +
+                        "configured operational range. Consider assigning " +
+                        "shorter routes or using drones with greater range."
                 });
         }
 
         if (scenario.Drones.Count > 0
             && fleetParticipation
-                < _options
-                    .UnderutilizedFleetThresholdPercentage)
+            < _options
+                .UnderutilizedFleetThresholdPercentage)
         {
             recommendations.Add(
                 new FleetRecommendation
                 {
-                    Type = "Information",
-                    Title = "Fleet Underutilized",
+                    Type =
+                        RecommendationType.FleetUtilization,
+                    Severity =
+                        RecommendationSeverity.Information,
+                    Title =
+                        "Fleet Underutilized",
                     Description =
-                        "Only a small portion of the available fleet participated " +
-                        "in this planning scenario."
+                        $"Less than {_options.UnderutilizedFleetThresholdPercentage:0.##}% " +
+                        "of the available fleet participated in this planning. " +
+                        "Review fleet sizing or planning strategy to improve " +
+                        "resource utilization."
                 });
         }
 
@@ -265,11 +292,15 @@ public sealed class FleetAdvisor
             recommendations.Add(
                 new FleetRecommendation
                 {
-                    Type = "Success",
-                    Title = "Fleet Well Balanced",
+                    Type =
+                        RecommendationType.Performance,
+                    Severity =
+                        RecommendationSeverity.Success,
+                    Title =
+                        "Fleet Well Balanced",
                     Description =
-                        "No relevant capacity, range or participation issues " +
-                        "were identified in this planning scenario."
+                        "The planning completed successfully without identifying " +
+                        "capacity, range or utilization concerns."
                 });
         }
 
@@ -282,13 +313,17 @@ public sealed class FleetAdvisor
     {
         var impossibleOrderIds =
             scenario.Result.ImpossibleOrders
-                .Select(order => order.Order.Id)
+                .Select(
+                    impossibleOrder =>
+                        impossibleOrder.Order.Id)
                 .ToHashSet(
                     StringComparer.OrdinalIgnoreCase);
 
         var impossibleOrders = scenario.Orders
-            .Where(order =>
-                impossibleOrderIds.Contains(order.Id))
+            .Where(
+                order =>
+                    impossibleOrderIds.Contains(
+                        order.Id))
             .ToArray();
 
         var minimumCapacity =
@@ -304,23 +339,31 @@ public sealed class FleetAdvisor
                 : impossibleOrders.Max(
                     order =>
                     {
-                        var x = Convert.ToDouble(order.Destination.X);
-                        var y = Convert.ToDouble(order.Destination.Y);
+                        var x = Convert.ToDouble(
+                            order.Destination.X);
+
+                        var y = Convert.ToDouble(
+                            order.Destination.Y);
 
                         var oneWayDistance =
-                            Math.Sqrt((x * x) + (y * y));
+                            Math.Sqrt(
+                                (x * x) + (y * y));
 
                         return oneWayDistance * 2;
                     });
 
         return new FleetRecommendation
         {
-            Type = "Critical",
-            Title = "Impossible Orders Detected",
+            Type =
+                RecommendationType.ImpossibleOrders,
+            Severity =
+                RecommendationSeverity.Critical,
+            Title =
+                "Impossible Orders Detected",
             Description =
-                $"{scenario.Result.ImpossibleOrders.Count} order(s) " +
-                "could not be assigned. Consider adding a drone " +
-                "with greater capacity or range.",
+                "Some orders could not be assigned because the current " +
+                "fleet does not satisfy the required payload or " +
+                "operational range.",
             SuggestedMinimumCapacityKg =
                 Round(minimumCapacity),
             SuggestedMinimumRangeKm =
@@ -337,7 +380,8 @@ public sealed class FleetAdvisor
         }
 
         var hours =
-            distanceKm / _options.DroneSpeedKmPerHour;
+            distanceKm
+            / _options.DroneSpeedKmPerHour;
 
         return hours * 60;
     }
@@ -354,16 +398,9 @@ public sealed class FleetAdvisor
         return numerator / denominator * 100;
     }
 
-    private static double Round(double value)
-    {
-        return Math.Round(
-            value,
-            2,
-            MidpointRounding.AwayFromZero);
-    }
     private static double CalculateRatioSafe(
-    double numerator,
-    double denominator)
+        double numerator,
+        double denominator)
     {
         if (denominator <= 0)
         {
@@ -371,5 +408,14 @@ public sealed class FleetAdvisor
         }
 
         return numerator / denominator;
+    }
+
+    private static double Round(
+        double value)
+    {
+        return Math.Round(
+            value,
+            2,
+            MidpointRounding.AwayFromZero);
     }
 }

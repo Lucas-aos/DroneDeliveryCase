@@ -749,8 +749,12 @@ public sealed class PlanningControllerTests
                 "Impossible Orders Detected");
 
         Assert.Equal(
-            "Critical",
+            "ImpossibleOrders",
             recommendation.Type);
+
+        Assert.Equal(
+            "Critical",
+            recommendation.Severity);
 
         Assert.Equal(
             10,

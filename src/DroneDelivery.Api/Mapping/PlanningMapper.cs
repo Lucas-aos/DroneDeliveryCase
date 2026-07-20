@@ -38,7 +38,8 @@ public static class PlanningMapper
                     new Coordinate(
                         request.X,
                         request.Y),
-                    MapPriority(request.Priority),
+                    MapPriority(
+                        request.Priority),
                     index))
             .ToArray();
     }
@@ -46,7 +47,8 @@ public static class PlanningMapper
     public static PlanningResponse ToResponse(
         PlanningResult planningResult)
     {
-        ArgumentNullException.ThrowIfNull(planningResult);
+        ArgumentNullException.ThrowIfNull(
+            planningResult);
 
         return new PlanningResponse
         {
@@ -54,78 +56,46 @@ public static class PlanningMapper
                 .Select(ToTripResponse)
                 .ToArray(),
 
-            ImpossibleOrders = planningResult.ImpossibleOrders
-                .Select(ToImpossibleOrderResponse)
-                .ToArray()
+            ImpossibleOrders =
+                planningResult.ImpossibleOrders
+                    .Select(
+                        ToImpossibleOrderResponse)
+                    .ToArray()
         };
     }
 
-    private static TripResponse ToTripResponse(
-        Trip trip)
+    public static IReadOnlyList<RouteResponse>
+        ToRouteResponses(
+            StoredPlanningScenario scenario)
     {
-        return new TripResponse
-        {
-            DroneId = trip.Drone.Id,
-
-            Orders = trip.Orders
-                .Select((order, index) => new TripOrderResponse
-                {
-                    Id = order.Id,
-                    Sequence = index + 1
-                })
-                .ToArray(),
-
-            TotalWeightKg = trip.TotalWeightKg,
-            TotalDistanceKm = trip.TotalDistanceKm
-        };
-    }
-
-    private static ImpossibleOrderResponse ToImpossibleOrderResponse(
-        ImpossibleOrder impossibleOrder)
-    {
-        return new ImpossibleOrderResponse
-        {
-            OrderId = impossibleOrder.Order.Id,
-            Reason = impossibleOrder.Reason.ToString()
-        };
-    }
-
-    private static Priority MapPriority(string priority)
-    {
-        return priority switch
-        {
-            "High" => Priority.High,
-            "Medium" => Priority.Medium,
-            "Low" => Priority.Low,
-
-            _ => throw new ArgumentException(
-                $"Invalid priority '{priority}'.",
-                nameof(priority))
-        };
-    }
-
-    public static IReadOnlyList<RouteResponse> ToRouteResponses(
-        StoredPlanningScenario scenario)
-    {
-        ArgumentNullException.ThrowIfNull(scenario);
+        ArgumentNullException.ThrowIfNull(
+            scenario);
 
         return scenario.Result.Trips
             .Select((trip, tripIndex) =>
                 new RouteResponse
                 {
-                    TripSequence = tripIndex + 1,
-                    DroneId = trip.Drone.Id,
-                    TotalWeightKg = trip.TotalWeightKg,
-                    TotalDistanceKm = trip.TotalDistanceKm,
+                    TripSequence =
+                        tripIndex + 1,
+                    DroneId =
+                        trip.Drone.Id,
+                    TotalWeightKg =
+                        trip.TotalWeightKg,
+                    TotalDistanceKm =
+                        trip.TotalDistanceKm,
 
                     Stops = trip.Orders
                         .Select((order, orderIndex) =>
                             new RouteStopResponse
                             {
-                                Sequence = orderIndex + 1,
-                                OrderId = order.Id,
-                                X = order.Destination.X,
-                                Y = order.Destination.Y
+                                Sequence =
+                                    orderIndex + 1,
+                                OrderId =
+                                    order.Id,
+                                X =
+                                    order.Destination.X,
+                                Y =
+                                    order.Destination.Y
                             })
                         .ToArray()
                 })
@@ -136,16 +106,18 @@ public static class PlanningMapper
         ToDroneSummaryResponses(
             StoredPlanningScenario scenario)
     {
-        ArgumentNullException.ThrowIfNull(scenario);
+        ArgumentNullException.ThrowIfNull(
+            scenario);
 
-        var tripsByDrone = scenario.Result.Trips
-            .GroupBy(
-                trip => trip.Drone.Id,
-                StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(
-                group => group.Key,
-                group => group.ToArray(),
-                StringComparer.OrdinalIgnoreCase);
+        var tripsByDrone =
+            scenario.Result.Trips
+                .GroupBy(
+                    trip => trip.Drone.Id,
+                    StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.ToArray(),
+                    StringComparer.OrdinalIgnoreCase);
 
         return scenario.Drones
             .Select(drone =>
@@ -157,8 +129,10 @@ public static class PlanningMapper
                     return new DroneSummaryResponse
                     {
                         DroneId = drone.Id,
-                        CapacityKg = drone.CapacityKg,
-                        RangeKm = drone.RangeKm,
+                        CapacityKg =
+                            drone.CapacityKg,
+                        RangeKm =
+                            drone.RangeKm,
                         WasUsed = false,
                         TripCount = 0,
                         DeliveredOrders = 0,
@@ -169,63 +143,89 @@ public static class PlanningMapper
 
                 return new DroneSummaryResponse
                 {
-                    DroneId = drone.Id,
-                    CapacityKg = drone.CapacityKg,
-                    RangeKm = drone.RangeKm,
+                    DroneId =
+                        drone.Id,
+                    CapacityKg =
+                        drone.CapacityKg,
+                    RangeKm =
+                        drone.RangeKm,
                     WasUsed = true,
-                    TripCount = droneTrips.Length,
-                    DeliveredOrders = droneTrips.Sum(
-                        trip => trip.Orders.Count),
-                    TotalDeliveredWeightKg = droneTrips.Sum(
-                        trip => trip.TotalWeightKg),
-                    TotalDistanceKm = droneTrips.Sum(
-                        trip => trip.TotalDistanceKm)
+                    TripCount =
+                        droneTrips.Length,
+                    DeliveredOrders =
+                        droneTrips.Sum(
+                            trip =>
+                                trip.Orders.Count),
+                    TotalDeliveredWeightKg =
+                        droneTrips.Sum(
+                            trip =>
+                                trip.TotalWeightKg),
+                    TotalDistanceKm =
+                        droneTrips.Sum(
+                            trip =>
+                                trip.TotalDistanceKm)
                 };
             })
             .ToArray();
     }
+
     public static FleetAnalysisResponse
-    ToFleetAnalysisResponse(
-        FleetAnalysis analysis)
+        ToFleetAnalysisResponse(
+            FleetAnalysis analysis)
     {
-        ArgumentNullException.ThrowIfNull(analysis);
+        ArgumentNullException.ThrowIfNull(
+            analysis);
 
         return new FleetAnalysisResponse
         {
-            TotalDrones = analysis.TotalDrones,
-            UsedDrones = analysis.UsedDrones,
-            TotalTrips = analysis.TotalTrips,
-            DeliveredOrders = analysis.DeliveredOrders,
-            ImpossibleOrders = analysis.ImpossibleOrders,
+            TotalDrones =
+                analysis.TotalDrones,
+            UsedDrones =
+                analysis.UsedDrones,
+            TotalTrips =
+                analysis.TotalTrips,
+            DeliveredOrders =
+                analysis.DeliveredOrders,
+            ImpossibleOrders =
+                analysis.ImpossibleOrders,
             TotalDeliveredWeightKg =
                 analysis.TotalDeliveredWeightKg,
             TotalDistanceKm =
                 analysis.TotalDistanceKm,
             FleetParticipationPercentage =
-                analysis.FleetParticipationPercentage,
+                analysis
+                    .FleetParticipationPercentage,
             AverageLoadFactorPercentage =
-                analysis.AverageLoadFactorPercentage,
+                analysis
+                    .AverageLoadFactorPercentage,
             FleetEfficiencyKgPerKm =
-                analysis.FleetEfficiencyKgPerKm,
+                analysis
+                    .FleetEfficiencyKgPerKm,
             EstimatedTotalTimeMinutes =
-                analysis.EstimatedTotalTimeMinutes,
+                analysis
+                    .EstimatedTotalTimeMinutes,
 
             Drones = analysis.Drones
                 .Select(drone =>
                     new DroneAnalysisResponse
                     {
-                        DroneId = drone.DroneId,
-                        WasUsed = drone.WasUsed,
-                        TripCount = drone.TripCount,
+                        DroneId =
+                            drone.DroneId,
+                        WasUsed =
+                            drone.WasUsed,
+                        TripCount =
+                            drone.TripCount,
                         DeliveredOrders =
                             drone.DeliveredOrders,
                         DeliveredWeightKg =
                             drone.DeliveredWeightKg,
-                        DistanceKm = drone.DistanceKm,
+                        DistanceKm =
+                            drone.DistanceKm,
                         EfficiencyKgPerKm =
                             drone.EfficiencyKgPerKm,
                         AverageLoadFactorPercentage =
-                            drone.AverageLoadFactorPercentage,
+                            drone
+                                .AverageLoadFactorPercentage,
                         AverageBatteryUsagePerTripPercentage =
                             drone
                                 .AverageBatteryUsagePerTripPercentage,
@@ -237,22 +237,82 @@ public static class PlanningMapper
                     })
                 .ToArray(),
 
-            Recommendations = analysis.Recommendations
-                .Select(recommendation =>
-                    new FleetRecommendationResponse
+            Recommendations =
+                analysis.Recommendations
+                    .Select(recommendation =>
+                        new FleetRecommendationResponse
+                        {
+                            Type =
+                                recommendation
+                                    .Type
+                                    .ToString(),
+                            Severity =
+                                recommendation
+                                    .Severity
+                                    .ToString(),
+                            Title =
+                                recommendation.Title,
+                            Description =
+                                recommendation.Description,
+                            SuggestedMinimumCapacityKg =
+                                recommendation
+                                    .SuggestedMinimumCapacityKg,
+                            SuggestedMinimumRangeKm =
+                                recommendation
+                                    .SuggestedMinimumRangeKm
+                        })
+                    .ToArray()
+        };
+    }
+
+    private static TripResponse ToTripResponse(
+        Trip trip)
+    {
+        return new TripResponse
+        {
+            DroneId = trip.Drone.Id,
+
+            Orders = trip.Orders
+                .Select((order, index) =>
+                    new TripOrderResponse
                     {
-                        Type = recommendation.Type,
-                        Title = recommendation.Title,
-                        Description =
-                            recommendation.Description,
-                        SuggestedMinimumCapacityKg =
-                            recommendation
-                                .SuggestedMinimumCapacityKg,
-                        SuggestedMinimumRangeKm =
-                            recommendation
-                                .SuggestedMinimumRangeKm
+                        Id = order.Id,
+                        Sequence = index + 1
                     })
-                .ToArray()
+                .ToArray(),
+
+            TotalWeightKg =
+                trip.TotalWeightKg,
+            TotalDistanceKm =
+                trip.TotalDistanceKm
+        };
+    }
+
+    private static ImpossibleOrderResponse
+        ToImpossibleOrderResponse(
+            ImpossibleOrder impossibleOrder)
+    {
+        return new ImpossibleOrderResponse
+        {
+            OrderId =
+                impossibleOrder.Order.Id,
+            Reason =
+                impossibleOrder.Reason.ToString()
+        };
+    }
+
+    private static Priority MapPriority(
+        string priority)
+    {
+        return priority switch
+        {
+            "High" => Priority.High,
+            "Medium" => Priority.Medium,
+            "Low" => Priority.Low,
+
+            _ => throw new ArgumentException(
+                $"Invalid priority '{priority}'.",
+                nameof(priority))
         };
     }
 }

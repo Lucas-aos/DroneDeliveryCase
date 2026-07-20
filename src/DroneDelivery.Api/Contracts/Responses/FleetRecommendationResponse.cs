@@ -4,6 +4,8 @@ public sealed record FleetRecommendationResponse
 {
     public required string Type { get; init; }
 
+    public required string Severity { get; init;}
+
     public required string Title { get; init; }
 
     public required string Description { get; init; }
