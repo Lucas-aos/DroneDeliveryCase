@@ -18,7 +18,6 @@ O projeto demonstra conhecimentos práticos em desenvolvimento backend, modelage
 
 - [Visão Geral](#visão-geral)
 - [Principais Funcionalidades](#principais-funcionalidades)
-- [Demonstração](#demonstração)
 - [Arquitetura da Solução](#arquitetura-da-solução)
 - [Tecnologias Utilizadas](#tecnologias-utilizadas)
 - [Estrutura do Projeto](#estrutura-do-projeto)
@@ -68,40 +67,6 @@ O dashboard consome os mesmos endpoints públicos da API e não replica nenhuma 
 - Testes automatizados de domínio e integração da API
 - Documentação da API com Swagger/OpenAPI
 - Sem dependência de frameworks frontend ou bibliotecas externas de gráficos
-
----
-
-## Demonstração
-
-### Dashboard
-
-Adicione a imagem principal do dashboard em:
-
-```text
-docs/images/dashboard-overview.png
-```
-
-```md
-![Dashboard do Drone Delivery Planner](docs/images/dashboard-overview.png)
-```
-
-### Visualização das Rotas
-
-```text
-docs/images/dashboard-routes.png
-```
-
-### Recomendações da Frota
-
-```text
-docs/images/fleet-recommendations.png
-```
-
-### Swagger
-
-```text
-docs/images/swagger-endpoints.png
-```
 
 ---
 
