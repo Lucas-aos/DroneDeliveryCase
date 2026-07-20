@@ -30,11 +30,19 @@ public sealed class PlanningController : ControllerBase
         }
         catch (ArgumentException ex)
         {
-            return BadRequest(new ErrorResponse
-            {
-                Message = "The request is invalid.",
-                Errors = [ex.Message]
-            });
+            return BadRequest(CreateErrorResponse(ex));
         }
+    }
+    private static ErrorResponse CreateErrorResponse(
+    ArgumentException exception)
+    {
+        return new ErrorResponse
+        {
+            Message = "The request is invalid.",
+            Errors =
+            [
+                exception.Message
+            ]
+        };
     }
 }

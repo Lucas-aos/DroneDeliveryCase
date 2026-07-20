@@ -1941,3 +1941,42 @@ Traduzir exceções do domínio para respostas HTTP melhora a experiência do cl
 ### Próximo passo
 
 Implementar os testes de integração para validar os principais cenários da API.
+
+---
+
+---
+
+## Sessão 32 — Testes de integração da API
+
+### Objetivo
+
+Validar o comportamento do endpoint de planejamento por meio de testes de integração executando o pipeline HTTP completo.
+
+### Resultado
+
+Foram implementados testes cobrindo os principais cenários de sucesso, validação e impossibilidade de atendimento.
+
+### Atividades realizadas
+
+- Configuração do `WebApplicationFactory`;
+- teste de requisição válida com validação do corpo da resposta;
+- teste de prioridade inválida retornando `HTTP 400`;
+- teste de peso inválido retornando `HTTP 400`;
+- teste de pedido impossível retornando `HTTP 200`;
+- validação completa com `dotnet test`.
+
+### Decisões tomadas
+
+- Os testes utilizam a API real em memória, sem mocks;
+- apenas os principais comportamentos do contrato HTTP foram cobertos;
+- regras detalhadas do algoritmo permaneceram nos testes unitários do domínio.
+
+### Principais conclusões
+
+- O fluxo HTTP completo foi validado;
+- as respostas `200` e `400` estão funcionando conforme esperado;
+- pedidos impossíveis são tratados como resultado de negócio, e não como erro da API.
+
+### Próximo passo
+
+Realizar a revisão final da solução, atualizar a documentação e preparar o encerramento do projeto.
