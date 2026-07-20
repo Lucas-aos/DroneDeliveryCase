@@ -18,6 +18,7 @@ The project demonstrates practical backend engineering, domain modeling, API des
 
 - [Overview](#overview)
 - [Key Features](#key-features)
+- [Demo](#demo)
 - [Solution Architecture](#solution-architecture)
 - [Technology Stack](#technology-stack)
 - [Project Structure](#project-structure)
@@ -44,6 +45,25 @@ Each order contains a unique identifier, package weight, delivery priority, and 
 The application evaluates whether each order can be served, generates delivery trips, calculates route distances, exposes the result through a REST API, stores the planning scenario in memory, and provides additional fleet-level operational analysis.
 
 The dashboard consumes the same public API endpoints and does not duplicate business logic in the browser.
+
+---
+## Demo
+
+## Dashboard
+
+![Dashboard](docs/images/dashboard-overview.png)
+
+## Routes
+
+![Routes](docs/images/dashboard-routes.png)
+
+## Recommendations
+
+![Fleet Recommendations](docs/images/fleet-recommendations.png)
+
+## Swagger
+
+![Swagger](docs/images/swagger-endpoints.png)
 
 ---
 
