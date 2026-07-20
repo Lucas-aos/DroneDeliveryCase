@@ -1861,3 +1861,42 @@ Adaptar o mapeamento às assinaturas reais do domínio reduz retrabalho e evita 
 ### Próximo passo
 
 Conectar o `PlanningController` ao `TripPlanner`, substituindo a resposta temporária pela execução real do planejamento.
+
+---
+
+---
+
+## Sessão 30 — Integração do controller com o planejamento
+
+### Objetivo
+
+Conectar o `PlanningController` ao `TripPlanner`, concluindo o fluxo funcional da API.
+
+### Resultado
+
+O endpoint `POST /api/planning` passou a converter a requisição para o domínio, executar o planejamento e retornar um `PlanningResponse` real.
+
+### Atividades realizadas
+
+- Integração do `PlanningMapper` ao controller;
+- execução do `TripPlanner`;
+- conversão do `PlanningResult` para os DTOs de resposta;
+- validação do endpoint pelo Swagger;
+- confirmação do cálculo de peso, distância e sequência das entregas.
+
+### Decisões tomadas
+
+- O `TripPlanner` continuará sendo instanciado diretamente no controller;
+- não será criada uma interface sem necessidade concreta;
+- a API continuará sem regras de negócio.
+
+### Validação
+
+- ✅ Build concluído;
+- ✅ endpoint retornando `HTTP 200`;
+- ✅ fluxo completo validado;
+- ✅ resposta compatível com o resultado esperado.
+
+### Próximo passo
+
+Implementar o tratamento de erros e as respostas `400 Bad Request`.
