@@ -2048,3 +2048,53 @@ GET /api/planning/{planningId}/drones
 ```
 
 reutilizando o cenário armazenado, preparando a base para o módulo de análise da frota e o dashboard.
+
+---
+
+## Sessão 34 — Endpoints especializados de rotas e drones
+
+### Objetivo
+
+Expandir a API REST com endpoints especializados para consulta das rotas planejadas e do resumo de utilização da frota, reutilizando o cenário armazenado em memória.
+
+### Resultado
+
+Foram implementados dois novos endpoints:
+
+```http
+GET /api/planning/{planningId}/routes
+GET /api/planning/{planningId}/drones
+```
+
+O primeiro retorna a sequência de entregas realizada em cada viagem, incluindo as coordenadas de cada parada. O segundo fornece um resumo operacional de todos os drones do planejamento, incluindo aqueles que não participaram de nenhuma entrega.
+
+### Implementações
+
+- criação dos contratos `RouteResponse`, `RouteStopResponse` e `DroneSummaryResponse`;
+- implementação de `PlanningMapper.ToRouteResponses()`;
+- implementação de `PlanningMapper.ToDroneSummaryResponses()`;
+- inclusão dos endpoints `/routes` e `/drones` no `PlanningController`;
+- reutilização do `StoredPlanningScenario` armazenado em memória;
+- retorno de `404 Not Found` para planejamentos inexistentes;
+- implementação de quatro novos testes de integração cobrindo sucesso e falha dos novos endpoints.
+
+### Decisões
+
+- os endpoints reutilizam exclusivamente os dados já armazenados em memória;
+- nenhuma nova execução do `TripPlanner` é realizada durante as consultas;
+- a sequência das paradas é derivada da ordem dos pedidos na viagem;
+- as coordenadas são obtidas diretamente dos pedidos armazenados no cenário;
+- o resumo da frota inclui drones utilizados e não utilizados;
+- nenhuma lógica de análise da frota foi adicionada nesta etapa.
+
+### Validação
+
+- ✅ `GET /routes` retorna as rotas planejadas corretamente;
+- ✅ `GET /drones` retorna o resumo completo da frota;
+- ✅ planejamentos inexistentes retornam `404 Not Found`;
+- ✅ todos os testes de integração aprovados;
+- ✅ suíte completa de testes validada com sucesso.
+
+### Próximo passo
+
+Implementar o módulo de análise da frota (`FleetAdvisor`), responsável por gerar métricas operacionais e recomendações sobre utilização, capacidade e eficiência da frota.

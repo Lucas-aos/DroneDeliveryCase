@@ -1,5 +1,6 @@
 using DroneDelivery.Api.Contracts.Requests;
 using DroneDelivery.Api.Contracts.Responses;
+using DroneDelivery.Api.Storage;
 using DroneDelivery.Domain.Entities;
 using DroneDelivery.Domain.Enums;
 using DroneDelivery.Domain.ValueObjects;
@@ -100,5 +101,86 @@ public static class PlanningMapper
                 $"Invalid priority '{priority}'.",
                 nameof(priority))
         };
+    }
+
+    public static IReadOnlyList<RouteResponse> ToRouteResponses(
+        StoredPlanningScenario scenario)
+    {
+        ArgumentNullException.ThrowIfNull(scenario);
+
+        return scenario.Result.Trips
+            .Select((trip, tripIndex) =>
+                new RouteResponse
+                {
+                    TripSequence = tripIndex + 1,
+                    DroneId = trip.Drone.Id,
+                    TotalWeightKg = trip.TotalWeightKg,
+                    TotalDistanceKm = trip.TotalDistanceKm,
+
+                    Stops = trip.Orders
+                        .Select((order, orderIndex) =>
+                            new RouteStopResponse
+                            {
+                                Sequence = orderIndex + 1,
+                                OrderId = order.Id,
+                                X = order.Destination.X,
+                                Y = order.Destination.Y
+                            })
+                        .ToArray()
+                })
+            .ToArray();
+    }
+
+    public static IReadOnlyList<DroneSummaryResponse>
+        ToDroneSummaryResponses(
+            StoredPlanningScenario scenario)
+    {
+        ArgumentNullException.ThrowIfNull(scenario);
+
+        var tripsByDrone = scenario.Result.Trips
+            .GroupBy(
+                trip => trip.Drone.Id,
+                StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(
+                group => group.Key,
+                group => group.ToArray(),
+                StringComparer.OrdinalIgnoreCase);
+
+        return scenario.Drones
+            .Select(drone =>
+            {
+                if (!tripsByDrone.TryGetValue(
+                        drone.Id,
+                        out var droneTrips))
+                {
+                    return new DroneSummaryResponse
+                    {
+                        DroneId = drone.Id,
+                        CapacityKg = drone.CapacityKg,
+                        RangeKm = drone.RangeKm,
+                        WasUsed = false,
+                        TripCount = 0,
+                        DeliveredOrders = 0,
+                        TotalDeliveredWeightKg = 0,
+                        TotalDistanceKm = 0
+                    };
+                }
+
+                return new DroneSummaryResponse
+                {
+                    DroneId = drone.Id,
+                    CapacityKg = drone.CapacityKg,
+                    RangeKm = drone.RangeKm,
+                    WasUsed = true,
+                    TripCount = droneTrips.Length,
+                    DeliveredOrders = droneTrips.Sum(
+                        trip => trip.Orders.Count),
+                    TotalDeliveredWeightKg = droneTrips.Sum(
+                        trip => trip.TotalWeightKg),
+                    TotalDistanceKm = droneTrips.Sum(
+                        trip => trip.TotalDistanceKm)
+                };
+            })
+            .ToArray();
     }
 }

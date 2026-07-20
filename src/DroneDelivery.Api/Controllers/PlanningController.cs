@@ -103,4 +103,42 @@ public sealed class PlanningController : ControllerBase
             ]
         };
     }
+
+    [HttpGet("{planningId:guid}/routes")]
+    [ProducesResponseType(
+    typeof(IReadOnlyList<RouteResponse>),
+    StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<IReadOnlyList<RouteResponse>> GetRoutes(
+    Guid planningId)
+    {
+        if (!_store.TryGet(planningId, out var scenario))
+        {
+            return NotFound();
+        }
+
+        var routes =
+            PlanningMapper.ToRouteResponses(scenario!);
+
+        return Ok(routes);
+    }
+
+    [HttpGet("{planningId:guid}/drones")]
+    [ProducesResponseType(
+    typeof(IReadOnlyList<DroneSummaryResponse>),
+    StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<IReadOnlyList<DroneSummaryResponse>> GetDrones(
+    Guid planningId)
+    {
+        if (!_store.TryGet(planningId, out var scenario))
+        {
+            return NotFound();
+        }
+
+        var drones =
+            PlanningMapper.ToDroneSummaryResponses(scenario!);
+
+        return Ok(drones);
+    }
 }

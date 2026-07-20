@@ -333,4 +333,190 @@ public sealed class PlanningControllerTests
             HttpStatusCode.NotFound,
             response.StatusCode);
     }
+    [Fact]
+    public async Task GetRoutes_WithExistingPlanning_ReturnsRoutes()
+    {
+        // Arrange
+        var request = new
+        {
+            drones = new[]
+            {
+            new
+            {
+                id = "DRONE-01",
+                capacityKg = 10,
+                rangeKm = 30
+            }
+        },
+            orders = new[]
+            {
+            new
+            {
+                id = "ORDER-01",
+                weightKg = 2,
+                priority = "High",
+                x = 3,
+                y = 4
+            }
+        }
+        };
+
+        var createResponse = await _client.PostAsJsonAsync(
+            "/api/planning",
+            request);
+
+        Assert.Equal(
+            HttpStatusCode.Created,
+            createResponse.StatusCode);
+
+        var created =
+            await createResponse.Content
+                .ReadFromJsonAsync<PlanningCreatedResponse>();
+
+        Assert.NotNull(created);
+
+        // Act
+        var response = await _client.GetAsync(
+            $"/api/planning/{created!.PlanningId}/routes");
+
+        // Assert
+        Assert.Equal(
+            HttpStatusCode.OK,
+            response.StatusCode);
+
+        var routes =
+            await response.Content
+                .ReadFromJsonAsync<List<RouteResponse>>();
+
+        Assert.NotNull(routes);
+        Assert.Single(routes);
+
+        var route = routes[0];
+
+        Assert.Equal(1, route.TripSequence);
+        Assert.Equal("DRONE-01", route.DroneId);
+        Assert.Equal(2, route.TotalWeightKg);
+        Assert.Equal(10, route.TotalDistanceKm);
+
+        Assert.Single(route.Stops);
+
+        var stop = route.Stops[0];
+
+        Assert.Equal(1, stop.Sequence);
+        Assert.Equal("ORDER-01", stop.OrderId);
+        Assert.Equal(3, stop.X);
+        Assert.Equal(4, stop.Y);
+    }
+    [Fact]
+    public async Task GetRoutes_WithUnknownPlanningId_ReturnsNotFound()
+    {
+        // Arrange
+        var planningId = Guid.NewGuid();
+
+        // Act
+        var response = await _client.GetAsync(
+            $"/api/planning/{planningId}/routes");
+
+        // Assert
+        Assert.Equal(
+            HttpStatusCode.NotFound,
+            response.StatusCode);
+    }
+    [Fact]
+    public async Task GetDrones_WithExistingPlanning_ReturnsDroneSummaries()
+    {
+        // Arrange
+        var request = new
+        {
+            drones = new[]
+            {
+            new
+            {
+                id = "DRONE-01",
+                capacityKg = 10,
+                rangeKm = 30
+            },
+            new
+            {
+                id = "DRONE-02",
+                capacityKg = 20,
+                rangeKm = 50
+            }
+        },
+            orders = new[]
+            {
+            new
+            {
+                id = "ORDER-01",
+                weightKg = 2,
+                priority = "High",
+                x = 3,
+                y = 4
+            }
+        }
+        };
+
+        var createResponse = await _client.PostAsJsonAsync(
+            "/api/planning",
+            request);
+
+        Assert.Equal(
+            HttpStatusCode.Created,
+            createResponse.StatusCode);
+
+        var created =
+            await createResponse.Content
+                .ReadFromJsonAsync<PlanningCreatedResponse>();
+
+        Assert.NotNull(created);
+
+        // Act
+        var response = await _client.GetAsync(
+            $"/api/planning/{created!.PlanningId}/drones");
+
+        // Assert
+        Assert.Equal(
+            HttpStatusCode.OK,
+            response.StatusCode);
+
+        var drones =
+            await response.Content
+                .ReadFromJsonAsync<List<DroneSummaryResponse>>();
+
+        Assert.NotNull(drones);
+        Assert.Equal(2, drones.Count);
+
+        var usedDrone = Assert.Single(
+        drones,
+        drone => drone.WasUsed);
+
+        Assert.Equal(1, usedDrone.TripCount);
+        Assert.Equal(1, usedDrone.DeliveredOrders);
+        Assert.Equal(2, usedDrone.TotalDeliveredWeightKg);
+        Assert.Equal(10, usedDrone.TotalDistanceKm);
+
+        var unusedDrone = Assert.Single(
+            drones,
+            drone => !drone.WasUsed);
+
+        Assert.Equal(0, unusedDrone.TripCount);
+        Assert.Equal(0, unusedDrone.DeliveredOrders);
+        Assert.Equal(0, unusedDrone.TotalDeliveredWeightKg);
+        Assert.Equal(0, unusedDrone.TotalDistanceKm);
+    }
+    [Fact]
+    public async Task GetDrones_WithUnknownPlanningId_ReturnsNotFound()
+    {
+        // Arrange
+        var planningId = Guid.NewGuid();
+
+        // Act
+        var response = await _client.GetAsync(
+            $"/api/planning/{planningId}/drones");
+
+        // Assert
+        Assert.Equal(
+            HttpStatusCode.NotFound,
+            response.StatusCode);
+    }
 }
