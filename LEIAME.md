@@ -954,7 +954,7 @@ Este projeto está licenciado sob a Licença MIT.
 
 O desenvolvimento deste projeto foi realizado de forma incremental, com registro das decisões técnicas, validações, testes e trade-offs arquiteturais.
 
-- [Consultar histórico de desenvolvimento assistido por IA] https://chatgpt.com/share/6a5e196f-dc94-83e9-8848-0a7b4b97055d
+- [Consultar histórico de desenvolvimento assistido por IA](https://chatgpt.com/share/6a5e196f-dc94-83e9-8848-0a7b4b97055d)
 
 ---
 
