@@ -747,8 +747,8 @@ Todos os cálculos permanecem no backend. O navegador é responsável apenas pel
 ### Clonar o repositório
 
 ```bash
-git clone https://github.com/<seu-usuario-github>/<nome-do-repositorio>.git
-cd <nome-do-repositorio>
+git clone https://github.com/Lucas-aos/DroneDeliveryCase.git
+cd DroneDeliveryCase
 ```
 
 ### Restaurar as dependências e compilar
