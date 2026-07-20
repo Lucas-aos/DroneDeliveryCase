@@ -18,7 +18,6 @@ The project demonstrates practical backend engineering, domain modeling, API des
 
 - [Overview](#overview)
 - [Key Features](#key-features)
-- [Demo](#demo)
 - [Solution Architecture](#solution-architecture)
 - [Technology Stack](#technology-stack)
 - [Project Structure](#project-structure)
@@ -68,40 +67,6 @@ The dashboard consumes the same public API endpoints and does not duplicate busi
 - Automated domain and API integration tests
 - Swagger/OpenAPI documentation
 - No frontend framework or external charting library required
-
----
-
-## Demo
-
-### Dashboard
-
-Add the main dashboard screenshot at:
-
-```text
-docs/images/dashboard-overview.png
-```
-
-```md
-![Drone Delivery Planner dashboard](docs/images/dashboard-overview.png)
-```
-
-### Route Visualization
-
-```text
-docs/images/dashboard-routes.png
-```
-
-### Fleet Recommendations
-
-```text
-docs/images/fleet-recommendations.png
-```
-
-### Swagger
-
-```text
-docs/images/swagger-endpoints.png
-```
 
 ---
 
