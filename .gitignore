@@ -1,4 +1,19 @@
-.vs/
+# Build
 bin/
 obj/
+
+# Visual Studio
+.vs/
 *.user
+*.csproj.user
+*.suo
+
+# Testes
+TestResults/
+*.trx
+*.coverage
+coverage/
+
+# Arquivos temporários
+.DS_Store
+Thumbs.db
