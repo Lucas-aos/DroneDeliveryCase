@@ -726,8 +726,8 @@ All calculations remain in the backend. The browser only renders API data.
 ### Clone the repository
 
 ```bash
-git clone https://github.com/<your-github-username>/<your-repository-name>.git
-cd <your-repository-name>
+git clone https://github.com/Lucas-aos/DroneDeliveryCase.git
+cd DroneDeliveryCase
 ```
 
 ### Restore and build
