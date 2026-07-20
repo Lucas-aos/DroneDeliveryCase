@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#licença)
 [![Status](https://img.shields.io/badge/status-active-success)](#)
 
-🌐 **Idiomas:** 🇺🇸 English(README.md) | 🇧🇷 [Português]
+🌐 **Idiomas:** 🇺🇸 [English](README.md) | 🇧🇷 [Português]
 
 Uma aplicação full stack para planejamento de entregas com drones, desenvolvida com **ASP.NET Core 8**, composta por um mecanismo de planejamento orientado ao domínio, armazenamento de cenários em memória, análise operacional da frota, endpoints REST, testes automatizados e um dashboard responsivo implementado com HTML, CSS, JavaScript e SVG nativos.
 
