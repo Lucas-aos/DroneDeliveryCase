@@ -1900,3 +1900,44 @@ O endpoint `POST /api/planning` passou a converter a requisição para o domíni
 ### Próximo passo
 
 Implementar o tratamento de erros e as respostas `400 Bad Request`.
+
+---
+
+---
+
+## Sessão 31 — Tratamento de erros da API
+
+### Objetivo
+
+Implementar o tratamento de requisições inválidas, convertendo exceções do domínio em respostas HTTP 400.
+
+### Resultado
+
+O `PlanningController` passou a capturar exceções derivadas de `ArgumentException` e retornar um `ErrorResponse` padronizado para o cliente.
+
+### Atividades realizadas
+
+- Implementação do tratamento de exceções no controller;
+- criação do método `CreateErrorResponse`;
+- documentação das respostas `200` e `400` no Swagger;
+- validação dos cenários de sucesso e erro.
+
+### Decisões tomadas
+
+- Utilização de um único `catch (ArgumentException)`;
+- manutenção do tratamento local no controller;
+- nenhuma infraestrutura adicional de tratamento global foi introduzida.
+
+### Principais conclusões
+
+- A API passou a responder adequadamente para requisições inválidas;
+- o fluxo principal do controller permaneceu simples e legível;
+- o comportamento esperado foi validado por testes manuais.
+
+### Lições aprendidas
+
+Traduzir exceções do domínio para respostas HTTP melhora a experiência do cliente da API sem comprometer a separação de responsabilidades.
+
+### Próximo passo
+
+Implementar os testes de integração para validar os principais cenários da API.
