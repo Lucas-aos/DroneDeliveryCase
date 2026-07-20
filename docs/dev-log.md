@@ -1744,3 +1744,76 @@ Implementar o mapeamento entre os contratos HTTP e os objetos do domínio, inclu
 - criação de `Coordinate`;
 - chamada ao `TripPlanner`;
 - conversão do resultado de domínio para `PlanningResponse`.
+
+---
+
+---
+
+# Sessão 28 — Mapeamento de Requests para o domínio
+
+## Objetivo
+
+Implementar a camada de mapeamento responsável por converter os contratos HTTP da API em objetos do domínio, preservando a separação entre a camada de apresentação e as regras de negócio.
+
+---
+
+## Resultado
+
+Foi implementado o `PlanningMapper`, responsável por transformar os DTOs de entrada (`PlanningRequest`) em coleções de `Drone` e `Order` do domínio.
+
+A implementação mantém o controller enxuto e centraliza toda a conversão entre os contratos HTTP e os modelos do domínio.
+
+---
+
+## Implementação realizada
+
+Foi criada a pasta:
+
+```text
+src/DroneDelivery.Api/Mapping
+```
+
+e implementado o arquivo:
+
+```text
+PlanningMapper.cs
+```
+
+Foram implementados os métodos:
+
+- `ToDomainDrones()`;
+- `ToDomainOrders()`;
+- `MapPriority()`.
+
+---
+
+## Decisões arquiteturais
+
+- concentrar todo o mapeamento DTO → Domínio em uma classe estática;
+- manter o `PlanningController` responsável apenas pelo fluxo HTTP;
+- gerar `InputOrder` a partir da posição dos elementos nas coleções recebidas;
+- converter `Priority` explicitamente por meio de um método dedicado (`MapPriority`);
+- criar `Coordinate` durante o mapeamento, sem expor esse detalhe ao contrato HTTP;
+- não adicionar qualquer regra de negócio ao mapper.
+
+---
+
+## Validação
+
+- ✅ `PlanningMapper` implementado;
+- ✅ conversão de drones implementada;
+- ✅ conversão de pedidos implementada;
+- ✅ conversão textual de prioridade implementada;
+- ✅ solução compilando sem erros.
+
+---
+
+## Lições aprendidas
+
+Centralizar o mapeamento entre contratos HTTP e modelos do domínio reduz o acoplamento do controller, melhora a organização da API e facilita futuras alterações tanto nos contratos quanto nas entidades do domínio, sem impactar a lógica de negócio.
+
+---
+
+## Próximo passo
+
+Integrar o `PlanningController` ao `TripPlanner`, utilizando o `PlanningMapper` para converter os contratos de entrada e, posteriormente, implementar o mapeamento do `PlanningResult` para `PlanningResponse`.
