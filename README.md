@@ -6,6 +6,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#license)
 [![Status](https://img.shields.io/badge/status-active-success)](#)
 
+🌐 **Languages:** 🇺🇸 English | 🇧🇷 [Português](LEIAME.md)
+
 A full-stack drone delivery planning application built with **ASP.NET Core 8**, a domain-focused planning engine, in-memory scenario storage, fleet analytics, REST endpoints, automated tests, and a responsive dashboard implemented with native HTML, CSS, JavaScript, and SVG.
 
 The project demonstrates practical backend engineering, domain modeling, API design, algorithmic reasoning, architectural trade-offs, and the ability to turn a technical take-home assignment into a complete, recruiter-friendly software product.
@@ -985,6 +987,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+---
+
+## Development History
+
+This project was developed incrementally, with technical decisions, validations, tests, and architectural trade-offs documented throughout the development process.
+
+- [View the AI-assisted development history] https://chatgpt.com/share/6a5e196f-dc94-83e9-8848-0a7b4b97055d
 
 ---
 
