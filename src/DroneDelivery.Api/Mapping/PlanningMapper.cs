@@ -1,5 +1,6 @@
 using DroneDelivery.Api.Contracts.Requests;
 using DroneDelivery.Api.Contracts.Responses;
+using DroneDelivery.Api.Models;
 using DroneDelivery.Api.Storage;
 using DroneDelivery.Domain.Entities;
 using DroneDelivery.Domain.Enums;
@@ -182,5 +183,76 @@ public static class PlanningMapper
                 };
             })
             .ToArray();
+    }
+    public static FleetAnalysisResponse
+    ToFleetAnalysisResponse(
+        FleetAnalysis analysis)
+    {
+        ArgumentNullException.ThrowIfNull(analysis);
+
+        return new FleetAnalysisResponse
+        {
+            TotalDrones = analysis.TotalDrones,
+            UsedDrones = analysis.UsedDrones,
+            TotalTrips = analysis.TotalTrips,
+            DeliveredOrders = analysis.DeliveredOrders,
+            ImpossibleOrders = analysis.ImpossibleOrders,
+            TotalDeliveredWeightKg =
+                analysis.TotalDeliveredWeightKg,
+            TotalDistanceKm =
+                analysis.TotalDistanceKm,
+            FleetParticipationPercentage =
+                analysis.FleetParticipationPercentage,
+            AverageLoadFactorPercentage =
+                analysis.AverageLoadFactorPercentage,
+            FleetEfficiencyKgPerKm =
+                analysis.FleetEfficiencyKgPerKm,
+            EstimatedTotalTimeMinutes =
+                analysis.EstimatedTotalTimeMinutes,
+
+            Drones = analysis.Drones
+                .Select(drone =>
+                    new DroneAnalysisResponse
+                    {
+                        DroneId = drone.DroneId,
+                        WasUsed = drone.WasUsed,
+                        TripCount = drone.TripCount,
+                        DeliveredOrders =
+                            drone.DeliveredOrders,
+                        DeliveredWeightKg =
+                            drone.DeliveredWeightKg,
+                        DistanceKm = drone.DistanceKm,
+                        EfficiencyKgPerKm =
+                            drone.EfficiencyKgPerKm,
+                        AverageLoadFactorPercentage =
+                            drone.AverageLoadFactorPercentage,
+                        AverageBatteryUsagePerTripPercentage =
+                            drone
+                                .AverageBatteryUsagePerTripPercentage,
+                        MaximumBatteryUsagePerTripPercentage =
+                            drone
+                                .MaximumBatteryUsagePerTripPercentage,
+                        EstimatedTimeMinutes =
+                            drone.EstimatedTimeMinutes
+                    })
+                .ToArray(),
+
+            Recommendations = analysis.Recommendations
+                .Select(recommendation =>
+                    new FleetRecommendationResponse
+                    {
+                        Type = recommendation.Type,
+                        Title = recommendation.Title,
+                        Description =
+                            recommendation.Description,
+                        SuggestedMinimumCapacityKg =
+                            recommendation
+                                .SuggestedMinimumCapacityKg,
+                        SuggestedMinimumRangeKm =
+                            recommendation
+                                .SuggestedMinimumRangeKm
+                    })
+                .ToArray()
+        };
     }
 }

@@ -1,3 +1,4 @@
+using DroneDelivery.Api.Analysis;
 using DroneDelivery.Api.Contracts.Requests;
 using DroneDelivery.Api.Contracts.Responses;
 using DroneDelivery.Api.Mapping;
@@ -12,10 +13,13 @@ namespace DroneDelivery.Api.Controllers;
 public sealed class PlanningController : ControllerBase
 {
     private readonly InMemoryPlanningStore _store;
+    private readonly FleetAdvisor _fleetAdvisor;
 
-    public PlanningController(InMemoryPlanningStore store)
+    public PlanningController(InMemoryPlanningStore store,
+    FleetAdvisor fleetAdvisor)
     {
         _store = store;
+        _fleetAdvisor = fleetAdvisor;
     }
 
     [HttpPost]
@@ -140,5 +144,29 @@ public sealed class PlanningController : ControllerBase
             PlanningMapper.ToDroneSummaryResponses(scenario!);
 
         return Ok(drones);
+    }
+    [HttpGet("{planningId:guid}/fleet-analysis")]
+    [ProducesResponseType(
+    typeof(FleetAnalysisResponse),
+    StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<FleetAnalysisResponse>
+    GetFleetAnalysis(Guid planningId)
+    {
+        if (!_store.TryGet(
+                planningId,
+                out var scenario))
+        {
+            return NotFound();
+        }
+
+        var analysis =
+            _fleetAdvisor.Analyze(scenario!);
+
+        var response =
+            PlanningMapper.ToFleetAnalysisResponse(
+                analysis);
+
+        return Ok(response);
     }
 }

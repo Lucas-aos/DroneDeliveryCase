@@ -519,4 +519,260 @@ public sealed class PlanningControllerTests
             HttpStatusCode.NotFound,
             response.StatusCode);
     }
+    [Fact]
+    public async Task GetFleetAnalysis_WithExistingPlanning_ReturnsAnalysis()
+    {
+        // Arrange
+        var request = new
+        {
+            drones = new[]
+            {
+            new
+            {
+                id = "DRONE-01",
+                capacityKg = 10,
+                rangeKm = 30
+            },
+            new
+            {
+                id = "DRONE-02",
+                capacityKg = 20,
+                rangeKm = 50
+            }
+        },
+            orders = new[]
+            {
+            new
+            {
+                id = "ORDER-01",
+                weightKg = 2,
+                priority = "High",
+                x = 3,
+                y = 4
+            }
+        }
+        };
+
+        var createResponse =
+            await _client.PostAsJsonAsync(
+                "/api/planning",
+                request);
+
+        Assert.Equal(
+            HttpStatusCode.Created,
+            createResponse.StatusCode);
+
+        var created =
+            await createResponse.Content
+                .ReadFromJsonAsync<PlanningCreatedResponse>();
+
+        Assert.NotNull(created);
+
+        // Act
+        var response = await _client.GetAsync(
+            $"/api/planning/{created!.PlanningId}/fleet-analysis");
+
+        // Assert
+        Assert.Equal(
+            HttpStatusCode.OK,
+            response.StatusCode);
+
+        var analysis =
+            await response.Content
+                .ReadFromJsonAsync<FleetAnalysisResponse>();
+
+        Assert.NotNull(analysis);
+
+        Assert.Equal(2, analysis!.TotalDrones);
+        Assert.Equal(1, analysis.UsedDrones);
+        Assert.Equal(1, analysis.TotalTrips);
+        Assert.Equal(1, analysis.DeliveredOrders);
+        Assert.Equal(0, analysis.ImpossibleOrders);
+
+        Assert.Equal(2, analysis.TotalDeliveredWeightKg);
+        Assert.Equal(10, analysis.TotalDistanceKm);
+
+        Assert.Equal(
+            50,
+            analysis.FleetParticipationPercentage);
+
+        Assert.Equal(
+            0.2,
+            analysis.FleetEfficiencyKgPerKm);
+
+        Assert.Equal(
+            15,
+            analysis.EstimatedTotalTimeMinutes);
+
+        Assert.Equal(2, analysis.Drones.Count);
+        Assert.NotEmpty(analysis.Recommendations);
+    }
+    [Fact]
+    public async Task GetFleetAnalysis_ReturnsUsedDroneMetrics()
+    {
+        // Arrange
+        var request = new
+        {
+            drones = new[]
+            {
+            new
+            {
+                id = "DRONE-01",
+                capacityKg = 10,
+                rangeKm = 20
+            }
+        },
+            orders = new[]
+            {
+            new
+            {
+                id = "ORDER-01",
+                weightKg = 5,
+                priority = "High",
+                x = 3,
+                y = 4
+            }
+        }
+        };
+
+        var createResponse =
+            await _client.PostAsJsonAsync(
+                "/api/planning",
+                request);
+
+        var created =
+            await createResponse.Content
+                .ReadFromJsonAsync<PlanningCreatedResponse>();
+
+        Assert.NotNull(created);
+
+        // Act
+        var response = await _client.GetAsync(
+            $"/api/planning/{created!.PlanningId}/fleet-analysis");
+
+        // Assert
+        var analysis =
+            await response.Content
+                .ReadFromJsonAsync<FleetAnalysisResponse>();
+
+        Assert.NotNull(analysis);
+
+        var drone = Assert.Single(
+            analysis!.Drones);
+
+        Assert.Equal("DRONE-01", drone.DroneId);
+        Assert.True(drone.WasUsed);
+        Assert.Equal(1, drone.TripCount);
+        Assert.Equal(1, drone.DeliveredOrders);
+        Assert.Equal(5, drone.DeliveredWeightKg);
+        Assert.Equal(10, drone.DistanceKm);
+
+        Assert.Equal(
+            0.5,
+            drone.EfficiencyKgPerKm);
+
+        Assert.Equal(
+            50,
+            drone.AverageLoadFactorPercentage);
+
+        Assert.Equal(
+            50,
+            drone.AverageBatteryUsagePerTripPercentage);
+
+        Assert.Equal(
+            50,
+            drone.MaximumBatteryUsagePerTripPercentage);
+
+        Assert.Equal(
+            15,
+            drone.EstimatedTimeMinutes);
+    }
+    [Fact]
+    public async Task GetFleetAnalysis_WithImpossibleOrder_ReturnsDroneSuggestion()
+    {
+        // Arrange
+        var request = new
+        {
+            drones = new[]
+            {
+            new
+            {
+                id = "DRONE-01",
+                capacityKg = 5,
+                rangeKm = 8
+            }
+        },
+            orders = new[]
+            {
+            new
+            {
+                id = "ORDER-01",
+                weightKg = 10,
+                priority = "High",
+                x = 3,
+                y = 4
+            }
+        }
+        };
+
+        var createResponse =
+            await _client.PostAsJsonAsync(
+                "/api/planning",
+                request);
+
+        var created =
+            await createResponse.Content
+                .ReadFromJsonAsync<PlanningCreatedResponse>();
+
+        Assert.NotNull(created);
+
+        // Act
+        var response = await _client.GetAsync(
+            $"/api/planning/{created!.PlanningId}/fleet-analysis");
+
+        // Assert
+        Assert.Equal(
+            HttpStatusCode.OK,
+            response.StatusCode);
+
+        var analysis =
+            await response.Content
+                .ReadFromJsonAsync<FleetAnalysisResponse>();
+
+        Assert.NotNull(analysis);
+        Assert.Equal(1, analysis!.ImpossibleOrders);
+        Assert.Equal(0, analysis.TotalTrips);
+
+        var recommendation = Assert.Single(
+            analysis.Recommendations,
+            item => item.Title ==
+                "Impossible Orders Detected");
+
+        Assert.Equal(
+            "Critical",
+            recommendation.Type);
+
+        Assert.Equal(
+            10,
+            recommendation.SuggestedMinimumCapacityKg);
+
+        Assert.Equal(
+            10,
+            recommendation.SuggestedMinimumRangeKm);
+    }
+    [Fact]
+    public async Task GetFleetAnalysis_WithUnknownPlanningId_ReturnsNotFound()
+    {
+        // Arrange
+        var planningId = Guid.NewGuid();
+
+        // Act
+        var response = await _client.GetAsync(
+            $"/api/planning/{planningId}/fleet-analysis");
+
+        // Assert
+        Assert.Equal(
+            HttpStatusCode.NotFound,
+            response.StatusCode);
+    }
 }

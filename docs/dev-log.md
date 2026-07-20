@@ -2098,3 +2098,55 @@ O primeiro retorna a sequência de entregas realizada em cada viagem, incluindo 
 ### Próximo passo
 
 Implementar o módulo de análise da frota (`FleetAdvisor`), responsável por gerar métricas operacionais e recomendações sobre utilização, capacidade e eficiência da frota.
+
+---
+
+## Sessão 35 — Implementação do módulo de análise da frota
+
+### Objetivo
+
+Implementar o módulo de análise da frota (`FleetAdvisor`), responsável por gerar métricas operacionais e recomendações a partir de um planejamento armazenado, mantendo a lógica desacoplada dos contratos HTTP.
+
+### Resultado
+
+Foi criada a estrutura de análise da frota baseada em modelos internos, permitindo calcular indicadores de utilização, eficiência e capacidade da frota sem depender da camada Web.
+
+### Implementações
+
+- criação do `FleetAdvisor`;
+- criação dos modelos internos `FleetAnalysis`, `DroneAnalysis` e `FleetRecommendation`;
+- criação de `FleetAnalysisOptions` para configuração dos parâmetros da análise;
+- implementação dos cálculos de:
+  - participação da frota;
+  - fator médio de carga;
+  - eficiência (kg/km);
+  - tempo estimado das viagens;
+  - utilização individual dos drones;
+  - consumo médio e máximo de autonomia;
+- geração de recomendações estruturadas (`Success`, `Information`, `Warning` e `Critical`);
+- correção das referências para refletir as entidades reais do domínio (`Trip.Drone`, `Order.Destination` e `ImpossibleOrder.Order`).
+
+### Decisões
+
+- o `FleetAdvisor` retorna apenas modelos internos;
+- o `PlanningMapper` permanece responsável pela conversão para os DTOs da API;
+- os cálculos utilizam exclusivamente os dados do `StoredPlanningScenario`;
+- as recomendações foram estruturadas em tipo, título e descrição, preparando a integração com o dashboard;
+- os parâmetros de análise permanecem configuráveis via `FleetAnalysisOptions`.
+
+### Validação
+
+- ✅ métricas calculadas corretamente a partir do cenário armazenado;
+- ✅ recomendações geradas conforme o estado da frota;
+- ✅ referências ajustadas para o modelo de domínio;
+- ✅ suíte completa de testes aprovada.
+
+### Próximo passo
+
+Implementar o endpoint:
+
+```http
+GET /api/planning/{planningId}/fleet-analysis
+```
+
+integrando o `FleetAdvisor` ao `PlanningMapper` para disponibilizar a análise completa por meio da API.

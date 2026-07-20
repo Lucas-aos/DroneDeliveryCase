@@ -1,4 +1,6 @@
 using DroneDelivery.Api.Storage;
+using DroneDelivery.Api.Analysis;
+using DroneDelivery.Api.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<InMemoryPlanningStore>();
+
+builder.Services.Configure<FleetAnalysisOptions>(
+    builder.Configuration.GetSection(
+        "FleetAnalysis"));
+
+builder.Services.AddSingleton<FleetAdvisor>();
 
 var app = builder.Build();
 
