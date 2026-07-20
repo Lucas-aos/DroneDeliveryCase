@@ -961,7 +961,7 @@ This project was developed incrementally, with technical decisions, validations,
 
 ## Author
 
-Developed as a software engineering portfolio project focused on:
+Developed by Lucas Santos as a software engineering portfolio project focused on:
 
 - backend development;
 - ASP.NET Core;
